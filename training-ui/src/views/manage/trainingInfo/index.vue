@@ -17,22 +17,22 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-<!--      <el-form-item label="创建人" prop="userId">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.userId"-->
-<!--          placeholder="请输入创建人"-->
-<!--          clearable-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="班级" prop="deptId">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.deptId"-->
-<!--          placeholder="请输入班级"-->
-<!--          clearable-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item label="创建人" prop="userId">-->
+      <!--        <el-input-->
+      <!--          v-model="queryParams.userId"-->
+      <!--          placeholder="请输入创建人"-->
+      <!--          clearable-->
+      <!--          @keyup.enter.native="handleQuery"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item label="班级" prop="deptId">-->
+      <!--        <el-input-->
+      <!--          v-model="queryParams.deptId"-->
+      <!--          placeholder="请输入班级"-->
+      <!--          clearable-->
+      <!--          @keyup.enter.native="handleQuery"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
       <el-form-item label="创建时间">
         <el-date-picker
           v-model="daterangeCreateTime"
@@ -44,25 +44,25 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
-<!--      <el-form-item label="更新人" prop="updatedBy">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.updatedBy"-->
-<!--          placeholder="请输入更新人"-->
-<!--          clearable-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="更新时间">-->
-<!--        <el-date-picker-->
-<!--          v-model="daterangeUpdateTime"-->
-<!--          style="width: 240px"-->
-<!--          value-format="yyyy-MM-dd"-->
-<!--          type="daterange"-->
-<!--          range-separator="-"-->
-<!--          start-placeholder="开始日期"-->
-<!--          end-placeholder="结束日期"-->
-<!--        ></el-date-picker>-->
-<!--      </el-form-item>-->
+      <!--      <el-form-item label="更新人" prop="updatedBy">-->
+      <!--        <el-input-->
+      <!--          v-model="queryParams.updatedBy"-->
+      <!--          placeholder="请输入更新人"-->
+      <!--          clearable-->
+      <!--          @keyup.enter.native="handleQuery"-->
+      <!--        />-->
+      <!--      </el-form-item>-->
+      <!--      <el-form-item label="更新时间">-->
+      <!--        <el-date-picker-->
+      <!--          v-model="daterangeUpdateTime"-->
+      <!--          style="width: 240px"-->
+      <!--          value-format="yyyy-MM-dd"-->
+      <!--          type="daterange"-->
+      <!--          range-separator="-"-->
+      <!--          start-placeholder="开始日期"-->
+      <!--          end-placeholder="结束日期"-->
+      <!--        ></el-date-picker>-->
+      <!--      </el-form-item>-->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -121,6 +121,18 @@
 
     <el-table v-loading="loading" :data="trainingInfoList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-card class="box-card" style="width: 80%;margin: 0 auto">
+            <div slot="header" class="clearfix">
+              <span>{{ props.row.trainingTitle }}</span>
+            </div>
+            <div class="text item">
+              {{ props.row.trainingDesc }}
+            </div>
+          </el-card>
+        </template>
+      </el-table-column>
       <el-table-column label="实训编号" align="center" v-if="columns[0].visible" prop="trainingId"/>
       <el-table-column label="实训标题" :show-overflow-tooltip="true" align="center" v-if="columns[1].visible"
                        prop="trainingTitle"
@@ -167,6 +179,14 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-plus"
+            @click="handleSelectedAdd(scope.row)"
+            v-hasPermi="['manage:trainingSelectedInfo:add']"
+          >选择实训
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['manage:trainingInfo:edit']"
@@ -202,7 +222,7 @@
           <el-input v-model="form.trainingDesc" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="实训文件" prop="trainingFile">
-          <file-upload v-model="form.trainingFile"/>
+          <file-upload :limit="1" v-model="form.trainingFile"/>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
@@ -210,6 +230,19 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 添加或修改实训选择对话框 -->
+    <el-dialog :title="title" :visible.sync="selectedOpen" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="备注" prop="remark">
+          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFormSelected">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -224,11 +257,14 @@ import {
   addTrainingInfo,
   updateTrainingInfo
 } from '@/api/manage/trainingInfo'
+import { addTrainingSelectedInfo } from '@/api/manage/trainingSelectedInfo'
 
 export default {
   name: 'TrainingInfo',
   data() {
     return {
+      //选择实训
+      selectedOpen: false,
       baseUrl: process.env.VUE_APP_BASE_API,
       //表格展示列
       columns: [
@@ -288,7 +324,7 @@ export default {
           { required: true, message: '实训描述不能为空', trigger: 'blur' }
         ],
         trainingFile: [
-          { required: true, message: '实训文件不能为空', trigger: 'blur' }
+          { required: false, message: '实训文件不能为空', trigger: 'blur' }
         ],
         userId: [
           { required: true, message: '创建人不能为空', trigger: 'blur' }
@@ -306,6 +342,21 @@ export default {
     this.getList()
   },
   methods: {
+    //  打开选择实训
+    handleSelectedAdd(row) {
+      this.reset()
+      this.form.trainingId = row.trainingId
+      this.title = '选择实训-' + row.trainingTitle
+      this.selectedOpen = true
+    },
+    //提交选择
+    submitFormSelected(){
+      addTrainingSelectedInfo(this.form).then(res=>{
+        this.$modal.msgSuccess('选择成功')
+        this.selectedOpen = false
+        this.getList()
+      })
+    },
     /** 查询实训信息列表 */
     getList() {
       this.loading = true
@@ -336,6 +387,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false
+      this.selectedOpen = false
       this.reset()
     },
     // 表单重置
