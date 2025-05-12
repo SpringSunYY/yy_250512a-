@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.ArchiveInfoMapper">
+    
+    <resultMap type="ArchiveInfo" id="ArchiveInfoResult">
+        <result property="archiveId"    column="archive_id"    />
+        <result property="username"    column="username"    />
+        <result property="stuNo"    column="stu_no"    />
+        <result property="sex"    column="sex"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="email"    column="email"    />
+        <result property="joinTime"    column="join_time"    />
+        <result property="graduatingSchool"    column="graduating_school"    />
+        <result property="graduatingTime"    column="graduating_time"    />
+        <result property="idCard"    column="id_card"    />
+        <result property="education"    column="education"    />
+        <result property="nation"    column="nation"    />
+        <result property="nativePlace"    column="native_place"    />
+        <result property="phone"    column="phone"    />
+        <result property="department"    column="department"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectArchiveInfoVo">
+        select archive_id, username, stu_no, sex, birthday, email, join_time, graduating_school, graduating_time, id_card, education, nation, native_place, phone, department, user_id, dept_id, create_time, updated_by, update_time, remark from tb_archive_info
+    </sql>
+
+    <select id="selectArchiveInfoList" parameterType="ArchiveInfo" resultMap="ArchiveInfoResult">
+        <include refid="selectArchiveInfoVo"/>
+        <where>  
+            <if test="archiveId != null "> and archive_id = #{archiveId}</if>
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="stuNo != null  and stuNo != ''"> and stu_no like concat('%', #{stuNo}, '%')</if>
+            <if test="sex != null  and sex != ''"> and sex = #{sex}</if>
+            <if test="params.beginBirthday != null and params.beginBirthday != '' and params.endBirthday != null and params.endBirthday != ''"> and DATE_FORMAT(birthday, '%Y-%m-%d') between #{params.beginBirthday} and #{params.endBirthday}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="params.beginJoinTime != null and params.beginJoinTime != '' and params.endJoinTime != null and params.endJoinTime != ''"> and DATE_FORMAT(join_time, '%Y-%m-%d') between #{params.beginJoinTime} and #{params.endJoinTime}</if>
+            <if test="graduatingSchool != null  and graduatingSchool != ''"> and graduating_school = #{graduatingSchool}</if>
+            <if test="params.beginGraduatingTime != null and params.beginGraduatingTime != '' and params.endGraduatingTime != null and params.endGraduatingTime != ''"> and DATE_FORMAT(graduating_time, '%Y-%m-%d') between #{params.beginGraduatingTime} and #{params.endGraduatingTime}</if>
+            <if test="idCard != null  and idCard != ''"> and id_card = #{idCard}</if>
+            <if test="education != null  and education != ''"> and education = #{education}</if>
+            <if test="nation != null  and nation != ''"> and nation = #{nation}</if>
+            <if test="nativePlace != null  and nativePlace != ''"> and native_place = #{nativePlace}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectArchiveInfoByArchiveId" parameterType="Long" resultMap="ArchiveInfoResult">
+        <include refid="selectArchiveInfoVo"/>
+        where archive_id = #{archiveId}
+    </select>
+
+    <insert id="insertArchiveInfo" parameterType="ArchiveInfo" useGeneratedKeys="true" keyProperty="archiveId">
+        insert into tb_archive_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null and username != ''">username,</if>
+            <if test="stuNo != null and stuNo != ''">stu_no,</if>
+            <if test="sex != null and sex != ''">sex,</if>
+            <if test="birthday != null">birthday,</if>
+            <if test="email != null">email,</if>
+            <if test="joinTime != null">join_time,</if>
+            <if test="graduatingSchool != null">graduating_school,</if>
+            <if test="graduatingTime != null">graduating_time,</if>
+            <if test="idCard != null and idCard != ''">id_card,</if>
+            <if test="education != null">education,</if>
+            <if test="nation != null">nation,</if>
+            <if test="nativePlace != null">native_place,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="department != null and department != ''">department,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null and username != ''">#{username},</if>
+            <if test="stuNo != null and stuNo != ''">#{stuNo},</if>
+            <if test="sex != null and sex != ''">#{sex},</if>
+            <if test="birthday != null">#{birthday},</if>
+            <if test="email != null">#{email},</if>
+            <if test="joinTime != null">#{joinTime},</if>
+            <if test="graduatingSchool != null">#{graduatingSchool},</if>
+            <if test="graduatingTime != null">#{graduatingTime},</if>
+            <if test="idCard != null and idCard != ''">#{idCard},</if>
+            <if test="education != null">#{education},</if>
+            <if test="nation != null">#{nation},</if>
+            <if test="nativePlace != null">#{nativePlace},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="department != null and department != ''">#{department},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateArchiveInfo" parameterType="ArchiveInfo">
+        update tb_archive_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="stuNo != null and stuNo != ''">stu_no = #{stuNo},</if>
+            <if test="sex != null and sex != ''">sex = #{sex},</if>
+            <if test="birthday != null">birthday = #{birthday},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="joinTime != null">join_time = #{joinTime},</if>
+            <if test="graduatingSchool != null">graduating_school = #{graduatingSchool},</if>
+            <if test="graduatingTime != null">graduating_time = #{graduatingTime},</if>
+            <if test="idCard != null and idCard != ''">id_card = #{idCard},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="nation != null">nation = #{nation},</if>
+            <if test="nativePlace != null">native_place = #{nativePlace},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
+            <if test="department != null and department != ''">department = #{department},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where archive_id = #{archiveId}
+    </update>
+
+    <delete id="deleteArchiveInfoByArchiveId" parameterType="Long">
+        delete from tb_archive_info where archive_id = #{archiveId}
+    </delete>
+
+    <delete id="deleteArchiveInfoByArchiveIds" parameterType="String">
+        delete from tb_archive_info where archive_id in 
+        <foreach item="archiveId" collection="array" open="(" separator="," close=")">
+            #{archiveId}
+        </foreach>
+    </delete>
+</mapper>

@@ -233,6 +233,11 @@
                 <artifactId>training-common</artifactId>
                 <version>${training.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.lz</groupId>
+                <artifactId>training-manage</artifactId>
+                <version>${training.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -244,6 +249,7 @@
         <module>training-quartz</module>
         <module>training-generator</module>
         <module>training-common</module>
+        <module>training-manage</module>
     </modules>
     <packaging>pom</packaging>
 

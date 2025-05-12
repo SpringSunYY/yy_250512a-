@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.TrainingInfoMapper">
+    
+    <resultMap type="TrainingInfo" id="TrainingInfoResult">
+        <result property="trainingId"    column="training_id"    />
+        <result property="trainingTitle"    column="training_title"    />
+        <result property="trainingDesc"    column="training_desc"    />
+        <result property="trainingFile"    column="training_file"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTrainingInfoVo">
+        select training_id, training_title, training_desc, training_file, user_id, dept_id, create_time, updated_by, update_time, remark from tb_training_info
+    </sql>
+
+    <select id="selectTrainingInfoList" parameterType="TrainingInfo" resultMap="TrainingInfoResult">
+        <include refid="selectTrainingInfoVo"/>
+        <where>  
+            <if test="trainingId != null "> and training_id = #{trainingId}</if>
+            <if test="trainingTitle != null  and trainingTitle != ''"> and training_title like concat('%', #{trainingTitle}, '%')</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectTrainingInfoByTrainingId" parameterType="Long" resultMap="TrainingInfoResult">
+        <include refid="selectTrainingInfoVo"/>
+        where training_id = #{trainingId}
+    </select>
+
+    <insert id="insertTrainingInfo" parameterType="TrainingInfo" useGeneratedKeys="true" keyProperty="trainingId">
+        insert into tb_training_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="trainingTitle != null and trainingTitle != ''">training_title,</if>
+            <if test="trainingDesc != null and trainingDesc != ''">training_desc,</if>
+            <if test="trainingFile != null and trainingFile != ''">training_file,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="trainingTitle != null and trainingTitle != ''">#{trainingTitle},</if>
+            <if test="trainingDesc != null and trainingDesc != ''">#{trainingDesc},</if>
+            <if test="trainingFile != null and trainingFile != ''">#{trainingFile},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTrainingInfo" parameterType="TrainingInfo">
+        update tb_training_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="trainingTitle != null and trainingTitle != ''">training_title = #{trainingTitle},</if>
+            <if test="trainingDesc != null and trainingDesc != ''">training_desc = #{trainingDesc},</if>
+            <if test="trainingFile != null and trainingFile != ''">training_file = #{trainingFile},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where training_id = #{trainingId}
+    </update>
+
+    <delete id="deleteTrainingInfoByTrainingId" parameterType="Long">
+        delete from tb_training_info where training_id = #{trainingId}
+    </delete>
+
+    <delete id="deleteTrainingInfoByTrainingIds" parameterType="String">
+        delete from tb_training_info where training_id in 
+        <foreach item="trainingId" collection="array" open="(" separator="," close=")">
+            #{trainingId}
+        </foreach>
+    </delete>
+</mapper>

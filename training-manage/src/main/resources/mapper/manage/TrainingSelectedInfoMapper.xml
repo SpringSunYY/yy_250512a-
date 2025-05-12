@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.TrainingSelectedInfoMapper">
+    
+    <resultMap type="TrainingSelectedInfo" id="TrainingSelectedInfoResult">
+        <result property="selectedId"    column="selected_id"    />
+        <result property="trainingId"    column="training_id"    />
+        <result property="content"    column="content"    />
+        <result property="contentFile"    column="content_file"    />
+        <result property="submitStatus"    column="submit_status"    />
+        <result property="submitTime"    column="submit_time"    />
+        <result property="score"    column="score"    />
+        <result property="comment"    column="comment"    />
+        <result property="status"    column="status"    />
+        <result property="teacherId"    column="teacher_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectTrainingSelectedInfoVo">
+        select selected_id, training_id, content, content_file, submit_status, submit_time, score, comment, status, teacher_id, user_id, dept_id, create_time, updated_by, update_time, remark from tb_training_selected_info
+    </sql>
+
+    <select id="selectTrainingSelectedInfoList" parameterType="TrainingSelectedInfo" resultMap="TrainingSelectedInfoResult">
+        <include refid="selectTrainingSelectedInfoVo"/>
+        <where>  
+            <if test="selectedId != null "> and selected_id = #{selectedId}</if>
+            <if test="trainingId != null "> and training_id = #{trainingId}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="contentFile != null  and contentFile != ''"> and content_file = #{contentFile}</if>
+            <if test="submitStatus != null  and submitStatus != ''"> and submit_status = #{submitStatus}</if>
+            <if test="params.beginSubmitTime != null and params.beginSubmitTime != '' and params.endSubmitTime != null and params.endSubmitTime != ''"> and DATE_FORMAT(submit_time, '%Y-%m-%d') between #{params.beginSubmitTime} and #{params.endSubmitTime}</if>
+            <if test="score != null "> and score = #{score}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="teacherId != null "> and teacher_id = #{teacherId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectTrainingSelectedInfoBySelectedId" parameterType="Long" resultMap="TrainingSelectedInfoResult">
+        <include refid="selectTrainingSelectedInfoVo"/>
+        where selected_id = #{selectedId}
+    </select>
+
+    <insert id="insertTrainingSelectedInfo" parameterType="TrainingSelectedInfo" useGeneratedKeys="true" keyProperty="selectedId">
+        insert into tb_training_selected_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="trainingId != null">training_id,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="contentFile != null and contentFile != ''">content_file,</if>
+            <if test="submitStatus != null and submitStatus != ''">submit_status,</if>
+            <if test="submitTime != null">submit_time,</if>
+            <if test="score != null">score,</if>
+            <if test="comment != null">comment,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="teacherId != null">teacher_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="trainingId != null">#{trainingId},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="contentFile != null and contentFile != ''">#{contentFile},</if>
+            <if test="submitStatus != null and submitStatus != ''">#{submitStatus},</if>
+            <if test="submitTime != null">#{submitTime},</if>
+            <if test="score != null">#{score},</if>
+            <if test="comment != null">#{comment},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="teacherId != null">#{teacherId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTrainingSelectedInfo" parameterType="TrainingSelectedInfo">
+        update tb_training_selected_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="trainingId != null">training_id = #{trainingId},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="contentFile != null and contentFile != ''">content_file = #{contentFile},</if>
+            <if test="submitStatus != null and submitStatus != ''">submit_status = #{submitStatus},</if>
+            <if test="submitTime != null">submit_time = #{submitTime},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="comment != null">comment = #{comment},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where selected_id = #{selectedId}
+    </update>
+
+    <delete id="deleteTrainingSelectedInfoBySelectedId" parameterType="Long">
+        delete from tb_training_selected_info where selected_id = #{selectedId}
+    </delete>
+
+    <delete id="deleteTrainingSelectedInfoBySelectedIds" parameterType="String">
+        delete from tb_training_selected_info where selected_id in 
+        <foreach item="selectedId" collection="array" open="(" separator="," close=")">
+            #{selectedId}
+        </foreach>
+    </delete>
+</mapper>
