@@ -288,7 +288,7 @@
                        prop="department"
       />
       <el-table-column label="学生" :show-overflow-tooltip="true" align="center" v-if="columns[15].visible"
-                       prop="userName"
+                       prop="userInfoName"
       />
       <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[16].visible"
                        prop="deptName"
