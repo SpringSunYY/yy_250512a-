@@ -266,14 +266,14 @@
     <!-- 添加或修改实训选择对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="实训" prop="trainingId">
-          <el-input v-model="form.trainingId" placeholder="请输入实训"/>
-        </el-form-item>
+        <!--        <el-form-item label="实训" prop="trainingId">-->
+        <!--          <el-input v-model="form.trainingId" placeholder="请输入实训"/>-->
+        <!--        </el-form-item>-->
         <el-form-item label="报告内容" prop="content">
           <el-input v-model="form.content" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
         <el-form-item label="报告文件" prop="contentFile">
-          <file-upload v-model="form.contentFile"/>
+          <file-upload :limit="1" v-model="form.contentFile"/>
         </el-form-item>
         <el-form-item label="提交状态" prop="submitStatus">
           <el-radio-group v-model="form.submitStatus">
@@ -285,22 +285,22 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="评分" prop="score">
-          <el-input v-model="form.score" placeholder="请输入评分"/>
+        <el-form-item label="评分" prop="score" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
+          <el-input-number :min="0" :max="100" v-model="form.score" placeholder="请输入评分"/>
         </el-form-item>
-        <el-form-item label="评语" prop="comment">
+        <el-form-item label="评语" prop="comment" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
           <el-input v-model="form.comment" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="form.status">
-            <el-radio
-              v-for="dict in dict.type.training_selected_status"
-              :key="dict.value"
-              :label="dict.value"
-            >{{ dict.label }}
-            </el-radio>
-          </el-radio-group>
-        </el-form-item>
+        <!--        <el-form-item label="状态" prop="status">-->
+        <!--          <el-radio-group v-model="form.status">-->
+        <!--            <el-radio-->
+        <!--              v-for="dict in dict.type.training_selected_status"-->
+        <!--              :key="dict.value"-->
+        <!--              :label="dict.value"-->
+        <!--            >{{ dict.label }}-->
+        <!--            </el-radio>-->
+        <!--          </el-radio-group>-->
+        <!--        </el-form-item>-->
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
@@ -321,6 +321,7 @@ import {
   addTrainingSelectedInfo,
   updateTrainingSelectedInfo
 } from '@/api/manage/trainingSelectedInfo'
+import { checkPermi } from '@/utils/permission'
 
 export default {
   name: 'TrainingSelectedInfo',
@@ -428,6 +429,7 @@ export default {
     this.getList()
   },
   methods: {
+    checkPermi,
     /** 查询实训选择列表 */
     getList() {
       this.loading = true
@@ -518,7 +520,7 @@ export default {
       getTrainingSelectedInfo(selectedId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = '修改实训选择'
+        this.title = '实训'
       })
     },
     /** 提交按钮 */

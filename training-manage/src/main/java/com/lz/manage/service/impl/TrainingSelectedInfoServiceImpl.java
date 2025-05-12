@@ -126,6 +126,12 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
      */
     @Override
     public int updateTrainingSelectedInfo(TrainingSelectedInfo trainingSelectedInfo) {
+        //如果评分大于60
+        if (trainingSelectedInfo.getScore().compareTo(new BigDecimal(60)) > 0) {
+            trainingSelectedInfo.setStatus("1");
+        }else {
+            trainingSelectedInfo.setStatus("2");
+        }
         trainingSelectedInfo.setUpdateTime(DateUtils.getNowDate());
         return trainingSelectedInfoMapper.updateTrainingSelectedInfo(trainingSelectedInfo);
     }
