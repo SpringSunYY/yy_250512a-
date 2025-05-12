@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysDept;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.utils.SecurityUtils;
@@ -64,6 +65,7 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
      * @param trainingInfo 实训信息
      * @return 实训信息
      */
+    @DataScope(deptAlias = "tb_training_info",userAlias = "tb_training_info")
     @Override
     public List<TrainingInfo> selectTrainingInfoList(TrainingInfo trainingInfo) {
         List<TrainingInfo> trainingInfos = trainingInfoMapper.selectTrainingInfoList(trainingInfo);

@@ -231,7 +231,7 @@
         >导出
         </el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" @doTable="doList" :columns="columns"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="archiveInfoList" @selection-change="handleSelectionChange">
@@ -289,7 +289,11 @@
       />
       <el-table-column label="学生" :show-overflow-tooltip="true" align="center" v-if="columns[15].visible"
                        prop="userInfoName"
-      />
+      >
+        <template slot-scope="scope">
+          {{scope.row.userInfoName}}
+        </template>
+      </el-table-column>
       <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[16].visible"
                        prop="deptName"
       />
@@ -613,6 +617,15 @@ export default {
   },
   methods: {
     checkPermi,
+    doList() {
+      const that = this
+      let list = this.archiveInfoList
+      this.archiveInfoList = []
+      //重新渲染数据
+      setTimeout(function() {
+        that.archiveInfoList = list
+      }, 1)
+    },
     /**
      * 获取学生用户列表推荐
      * @param query

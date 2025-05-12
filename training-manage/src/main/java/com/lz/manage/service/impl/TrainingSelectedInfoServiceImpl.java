@@ -74,6 +74,12 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
      */
     @Override
     public List<TrainingSelectedInfo> selectTrainingSelectedInfoList(TrainingSelectedInfo trainingSelectedInfo) {
+        if (SecurityUtils.hasRole("student")) {
+            trainingSelectedInfo.setUserId(SecurityUtils.getUserId());
+        }
+        if (SecurityUtils.hasRole("teacher")) {
+            trainingSelectedInfo.setTeacherId(SecurityUtils.getUserId());
+        }
         List<TrainingSelectedInfo> trainingSelectedInfos = trainingSelectedInfoMapper.selectTrainingSelectedInfoList(trainingSelectedInfo);
         for (TrainingSelectedInfo info : trainingSelectedInfos) {
             SysUser sysUser = userService.selectUserById(info.getUserId());
@@ -127,10 +133,12 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
     @Override
     public int updateTrainingSelectedInfo(TrainingSelectedInfo trainingSelectedInfo) {
         //如果评分大于60
-        if (trainingSelectedInfo.getScore().compareTo(new BigDecimal(60)) > 0) {
-            trainingSelectedInfo.setStatus("1");
-        }else {
-            trainingSelectedInfo.setStatus("2");
+        if (StringUtils.isNotNull(trainingSelectedInfo.getScore())) {
+            if (trainingSelectedInfo.getScore().compareTo(new BigDecimal(60)) > 0) {
+                trainingSelectedInfo.setStatus("1");
+            } else {
+                trainingSelectedInfo.setStatus("2");
+            }
         }
         trainingSelectedInfo.setUpdateTime(DateUtils.getNowDate());
         return trainingSelectedInfoMapper.updateTrainingSelectedInfo(trainingSelectedInfo);

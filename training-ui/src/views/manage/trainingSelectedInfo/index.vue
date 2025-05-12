@@ -402,7 +402,7 @@ export default {
           { required: true, message: '报告内容不能为空', trigger: 'blur' }
         ],
         contentFile: [
-          { required: true, message: '报告文件不能为空', trigger: 'blur' }
+          { required: false, message: '报告文件不能为空', trigger: 'blur' }
         ],
         submitStatus: [
           { required: true, message: '提交状态不能为空', trigger: 'change' }

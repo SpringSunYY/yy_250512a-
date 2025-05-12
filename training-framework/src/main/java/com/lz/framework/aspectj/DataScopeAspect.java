@@ -1,18 +1,7 @@
 package com.lz.framework.aspectj;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.springframework.stereotype.Component;
 import com.lz.common.annotation.DataScope;
 import com.lz.common.constant.UserConstants;
-import com.lz.common.core.domain.BaseEntity;
 import com.lz.common.core.domain.entity.SysRole;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.core.domain.model.LoginUser;
@@ -20,6 +9,16 @@ import com.lz.common.core.text.Convert;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 import com.lz.framework.security.context.PermissionContextHolder;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据过滤处理
@@ -181,8 +180,6 @@ public class DataScopeAspect {
                     paramsMap = new HashMap<>();
                 }
                 paramsMap.put(DATA_SCOPE, "");
-//                System.err.println("params = " + params);
-//                System.out.println("paramsMap = " + paramsMap);
             } catch (Exception e) {
                 // 异常处理：记录日志或抛出自定义异常
                 throw new RuntimeException("Failed to clear data scope in params", e);

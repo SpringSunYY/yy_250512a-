@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysDept;
 import com.lz.common.core.domain.entity.SysUser;
 import com.lz.common.exception.ServiceException;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 
 import java.util.Date;
@@ -66,8 +68,12 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
      * @param archiveInfo 学生档案
      * @return 学生档案
      */
+    @DataScope(userAlias = "tb_archive_info", deptAlias = "tb_archive_info")
     @Override
     public List<ArchiveInfo> selectArchiveInfoList(ArchiveInfo archiveInfo) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())&&SecurityUtils.hasRole("student")) {
+            archiveInfo.setUserId(SecurityUtils.getUserId());
+        }
         List<ArchiveInfo> archiveInfos = archiveInfoMapper.selectArchiveInfoList(archiveInfo);
         for (ArchiveInfo info : archiveInfos) {
             SysUser sysUser = userService.selectUserById(info.getUserId());

@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lz.manage.mapper.TrainingInfoMapper">
-    
+
     <resultMap type="TrainingInfo" id="TrainingInfoResult">
         <result property="trainingId"    column="training_id"    />
         <result property="trainingTitle"    column="training_title"    />
@@ -23,17 +23,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectTrainingInfoList" parameterType="TrainingInfo" resultMap="TrainingInfoResult">
         <include refid="selectTrainingInfoVo"/>
-        <where>  
-            <if test="trainingId != null "> and training_id = #{trainingId}</if>
-            <if test="trainingTitle != null  and trainingTitle != ''"> and training_title like concat('%', #{trainingTitle}, '%')</if>
-            <if test="userId != null "> and user_id = #{userId}</if>
-            <if test="deptId != null "> and dept_id = #{deptId}</if>
-            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
-            <if test="updatedBy != null  and updatedBy != ''"> and updated_by like concat('%', #{updatedBy}, '%')</if>
-            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        <where>
+            <if test="trainingId != null ">and training_id = #{trainingId}</if>
+            <if test="trainingTitle != null  and trainingTitle != ''">and training_title like concat('%',
+                #{trainingTitle}, '%')
+            </if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+            <if test="updatedBy != null  and updatedBy != ''">and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
     </select>
-    
+
     <select id="selectTrainingInfoByTrainingId" parameterType="Long" resultMap="TrainingInfoResult">
         <include refid="selectTrainingInfoVo"/>
         where training_id = #{trainingId}
@@ -86,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <delete id="deleteTrainingInfoByTrainingIds" parameterType="String">
-        delete from tb_training_info where training_id in 
+        delete from tb_training_info where training_id in
         <foreach item="trainingId" collection="array" open="(" separator="," close=")">
             #{trainingId}
         </foreach>
