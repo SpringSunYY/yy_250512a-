@@ -20,6 +20,8 @@ import com.lz.common.utils.DateUtils;
 
 import javax.annotation.Resource;
 
+import com.lz.manage.model.domain.ClassInfo;
+import com.lz.manage.service.IClassInfoService;
 import com.lz.system.service.ISysDeptService;
 import com.lz.system.service.ISysUserService;
 import org.apache.poi.hpsf.IllegalPropertySetDataException;
@@ -49,6 +51,9 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
     @Resource
     private ISysDeptService deptService;
 
+    @Resource
+    private IClassInfoService classInfoService;
+
     //region mybatis代码
 
     /**
@@ -71,7 +76,7 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
     @DataScope(userAlias = "tb_archive_info", deptAlias = "tb_archive_info")
     @Override
     public List<ArchiveInfo> selectArchiveInfoList(ArchiveInfo archiveInfo) {
-        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId())&&SecurityUtils.hasRole("student")) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("student")) {
             archiveInfo.setUserId(SecurityUtils.getUserId());
         }
         List<ArchiveInfo> archiveInfos = archiveInfoMapper.selectArchiveInfoList(archiveInfo);
@@ -83,6 +88,10 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
             SysDept sysDept = deptService.selectDeptById(info.getDeptId());
             if (StringUtils.isNotNull(sysDept)) {
                 info.setDeptName(sysDept.getDeptName());
+            }
+            ClassInfo classInfo = classInfoService.selectClassInfoByClassId(info.getClassId());
+            if (StringUtils.isNotNull(classInfo)) {
+                info.setClassName(classInfo.getClassName());
             }
         }
         return archiveInfos;
@@ -96,16 +105,26 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
      */
     @Override
     public int insertArchiveInfo(ArchiveInfo archiveInfo) {
+        checkClass(archiveInfo);
+        archiveInfo.setCreateTime(DateUtils.getNowDate());
+        return archiveInfoMapper.insertArchiveInfo(archiveInfo);
+    }
+
+    private void checkClass(ArchiveInfo archiveInfo) {
         SysUser sysUser = userService.selectUserById(archiveInfo.getUserId());
         if (StringUtils.isNull(sysUser)) {
             throw new ServiceException("该学生不存在！！！");
         }
-        if (StringUtils.isNull(sysUser.getDeptId())) {
-            throw new ServiceException("学生为绑定班级！！！");
+        //查询班级
+        ClassInfo classInfo = classInfoService.selectClassInfoByClassId(sysUser.getClassId());
+        if (StringUtils.isNull(classInfo)) {
+            throw new ServiceException("该学生未绑定班级！！！");
         }
-        archiveInfo.setDeptId(sysUser.getDeptId());
-        archiveInfo.setCreateTime(DateUtils.getNowDate());
-        return archiveInfoMapper.insertArchiveInfo(archiveInfo);
+        if (StringUtils.isNull(classInfo.getDeptId())) {
+            throw new ServiceException("该班级未绑定学院！！！");
+        }
+        archiveInfo.setDeptId(classInfo.getDeptId());
+        archiveInfo.setClassId(sysUser.getClassId());
     }
 
     /**
@@ -116,15 +135,9 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
      */
     @Override
     public int updateArchiveInfo(ArchiveInfo archiveInfo) {
-        SysUser sysUser = userService.selectUserById(archiveInfo.getUserId());
-        if (StringUtils.isNull(sysUser)) {
-            throw new ServiceException("该学生不存在！！！");
-        }
-        if (StringUtils.isNull(sysUser.getDeptId())) {
-            throw new ServiceException("学生为绑定班级！！！");
-        }
-        archiveInfo.setDeptId(sysUser.getDeptId());
+        checkClass(archiveInfo);
         archiveInfo.setUpdateTime(DateUtils.getNowDate());
+        archiveInfo.setUpdatedBy(SecurityUtils.getUsername());
         return archiveInfoMapper.updateArchiveInfo(archiveInfo);
     }
 

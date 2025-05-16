@@ -121,10 +121,14 @@ public class ArchiveInfoVo implements Serializable {
     private String userInfoName;
     private Long userId;
 
+    @Excel(name = "班级编号", type = Excel.Type.IMPORT)
+    private Long classId;
+    @Excel(name = "班级", type = Excel.Type.EXPORT)
+    private String className;
     /**
      * 班级
      */
-    @Excel(name = "班级")
+    @Excel(name = "院校",type = Excel.Type.EXPORT)
     private String deptName;
     private Long deptId;
 

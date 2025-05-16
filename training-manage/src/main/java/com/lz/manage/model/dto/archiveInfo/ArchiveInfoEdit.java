@@ -3,6 +3,7 @@ package com.lz.manage.model.dto.archiveInfo;
 import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lz.common.annotation.Excel;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 import com.lz.manage.model.domain.ArchiveInfo;
@@ -67,6 +68,8 @@ public class ArchiveInfoEdit implements Serializable
 
     /** 学生 */
     private Long userId;
+
+    private Long classId;
 
     /** 班级 */
     private Long deptId;

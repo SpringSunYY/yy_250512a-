@@ -123,15 +123,24 @@ public class ArchiveInfo implements Serializable {
     /**
      * 学生
      */
-    @Excel(name = "学生")
+    @Excel(name = "学生",  type = Excel.Type.EXPORT)
     @TableField(exist = false)
     private String userInfoName;
+    @Excel(name = "学生编号",  type = Excel.Type.IMPORT)
     private Long userId;
 
     /**
      * 班级
      */
-    @Excel(name = "班级")
+    @Excel(name = "班级编号", type = Excel.Type.IMPORT)
+    private Long classId;
+    @TableField(exist = false)
+    private String className;
+
+    /**
+     * 班级
+     */
+    @Excel(name = "院校")
     @TableField(exist = false)
     private String deptName;
     private Long deptId;

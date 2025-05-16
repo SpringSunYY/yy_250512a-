@@ -57,6 +57,7 @@
                u.phonenumber,
                u.password,
                u.sex,
+               u.class_id,
                u.status,
                u.del_flag,
                u.login_ip,

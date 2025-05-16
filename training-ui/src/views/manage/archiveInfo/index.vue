@@ -124,13 +124,24 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="院系" prop="department">
-        <el-input
-          v-model="queryParams.department"
-          placeholder="请输入院系"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="班级" prop="userId" v-if="isClassQuery">
+        <el-select
+          v-model="queryParams.classId"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入班级标题"
+          :remote-method="selectClassInfoList"
+          :loading="classLoading"
+        >
+          <el-option
+            v-for="item in classInfoList"
+            :key="item.classId"
+            :label="item.className"
+            :value="item.classId"
+          >
+          </el-option>
+        </el-select>
       </el-form-item>
       <!--      <el-form-item label="学生" prop="userId">-->
       <!--        <el-input-->
@@ -231,7 +242,8 @@
         >导出
         </el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" @doTable="doList" :columns="columns"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" @doTable="doList" :columns="columns"
+      ></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="archiveInfoList" @selection-change="handleSelectionChange">
@@ -291,26 +303,29 @@
                        prop="userInfoName"
       >
         <template slot-scope="scope">
-          {{scope.row.userInfoName}}
+          {{ scope.row.userInfoName }}
         </template>
       </el-table-column>
       <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[16].visible"
+                       prop="className"
+      />
+      <el-table-column label="院系" :show-overflow-tooltip="true" align="center" v-if="columns[17].visible"
                        prop="deptName"
       />
-      <el-table-column label="创建时间" align="center" v-if="columns[17].visible" prop="createTime" width="180">
+      <el-table-column label="创建时间" align="center" v-if="columns[18].visible" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[18].visible"
+      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[19].visible"
                        prop="updatedBy"
       />
-      <el-table-column label="更新时间" align="center" v-if="columns[19].visible" prop="updateTime" width="180">
+      <el-table-column label="更新时间" align="center" v-if="columns[20].visible" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[20].visible"
+      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[21].visible"
                        prop="remark"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -410,9 +425,6 @@
         <el-form-item label="联系电话" prop="phone">
           <el-input v-model="form.phone" placeholder="请输入联系电话"/>
         </el-form-item>
-        <el-form-item label="院系" prop="department">
-          <el-input v-model="form.department" placeholder="请输入院系"/>
-        </el-form-item>
         <el-form-item label="学生" prop="userId" v-if="isUserQuery">
           <el-select
             v-model="form.userId"
@@ -457,12 +469,22 @@ import {
 } from '@/api/manage/archiveInfo'
 import { allocatedUserList } from '@/api/system/role'
 import { checkPermi } from '@/utils/permission'
+import { listClassInfo } from '@/api/manage/classInfo'
 
 export default {
   name: 'ArchiveInfo',
   dicts: ['sys_user_sex'],
   data() {
     return {
+      isClassQuery: false,
+      //班级相关信息
+      classInfoList: [],
+      classLoading: false,
+      classQueryParams: {
+        classTitle: '',
+        pageNum: 1,
+        pageSize: 100
+      },
       isUserQuery: false,
       //用户相关信息
       userInfoList: [],
@@ -489,13 +511,14 @@ export default {
         { key: 11, label: '民族', visible: false },
         { key: 12, label: '籍贯', visible: false },
         { key: 13, label: '联系电话', visible: true },
-        { key: 14, label: '院系', visible: true },
-        { key: 15, label: '学生', visible: false },
-        { key: 16, label: '班级', visible: false },
-        { key: 17, label: '创建时间', visible: false },
-        { key: 18, label: '更新人', visible: false },
-        { key: 19, label: '更新时间', visible: false },
-        { key: 20, label: '备注', visible: false }
+        { key: 14, label: '院系', visible: false },
+        { key: 15, label: '学生', visible: true },
+        { key: 16, label: '班级', visible: true },
+        { key: 17, label: '院校', visible: false },
+        { key: 18, label: '创建时间', visible: false },
+        { key: 19, label: '更新人', visible: false },
+        { key: 20, label: '更新时间', visible: false },
+        { key: 21, label: '备注', visible: false }
       ],
       // 遮罩层
       loading: true,
@@ -543,12 +566,12 @@ export default {
         nation: null,
         nativePlace: null,
         phone: null,
-        department: null,
+        classId: null,
         userId: null,
         deptId: null,
         createTime: null,
         updatedBy: null,
-        updateTime: null
+        updateTime: null,
       },
       // 表单参数
       form: {},
@@ -590,8 +613,8 @@ export default {
         userId: [
           { required: true, message: '学生不能为空', trigger: 'blur' }
         ],
-        deptId: [
-          { required: true, message: '班级不能为空', trigger: 'blur' }
+        classId: [
+          { required: true, message: "班级不能为空", trigger: "blur" }
         ],
         createTime: [
           { required: true, message: '创建时间不能为空', trigger: 'blur' }
@@ -614,9 +637,47 @@ export default {
       this.isUserQuery = true
       this.getUserInfoList()
     }
+    if (checkPermi(['manage:classInfo:list'])) {
+      this.isClassQuery = true
+      this.getClassInfoList()
+    }
   },
   methods: {
     checkPermi,
+    /**
+     * 获取班级列表推荐
+     * @param query
+     */
+    selectClassInfoList(query) {
+      if (query !== '') {
+        this.classLoading = true
+        this.classQueryParams.classTitle = query
+        setTimeout(() => {
+          this.getClassInfoList()
+        }, 200)
+      } else {
+        this.classInfoList = []
+        this.classQueryParams.className = null
+      }
+    },
+    /**
+     * 获取班级信息列表
+     */
+    getClassInfoList() {
+      //添加查询参数
+      if (this.form.classId != null) {
+        this.classQueryParams.classId = this.form.classId
+      } else {
+        this.classQueryParams.classId = null
+      }
+      if (this.classQueryParams.classTitle !== '') {
+        this.classQueryParams.classId = null
+      }
+      listClassInfo(this.classQueryParams).then(res => {
+        this.classInfoList = res?.rows
+        this.classLoading = false
+      })
+    },
     doList() {
       const that = this
       let list = this.archiveInfoList
@@ -712,7 +773,7 @@ export default {
         nation: null,
         nativePlace: null,
         phone: null,
-        department: null,
+        classId: null,
         userId: null,
         deptId: null,
         createTime: null,

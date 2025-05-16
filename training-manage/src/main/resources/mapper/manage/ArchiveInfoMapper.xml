@@ -19,7 +19,7 @@
         <result property="nation" column="nation"/>
         <result property="nativePlace" column="native_place"/>
         <result property="phone" column="phone"/>
-        <result property="department" column="department"/>
+        <result property="classId" column="class_id"/>
         <result property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <result property="createTime" column="create_time"/>
@@ -43,7 +43,7 @@
                nation,
                native_place,
                phone,
-               department,
+               class_id,
                user_id,
                dept_id,
                create_time,
@@ -79,7 +79,7 @@
             <if test="nation != null  and nation != ''">and nation = #{nation}</if>
             <if test="nativePlace != null  and nativePlace != ''">and native_place = #{nativePlace}</if>
             <if test="phone != null  and phone != ''">and phone = #{phone}</if>
-            <if test="department != null  and department != ''">and department = #{department}</if>
+            <if test="classId != null ">and class_id = #{classId}</if>
             <if test="userId != null ">and user_id = #{userId}</if>
             <if test="deptId != null ">and dept_id = #{deptId}</if>
             <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
@@ -89,8 +89,6 @@
             <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
                 and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
             </if>
-            <!-- 数据范围过滤 -->
-            ${params.dataScope}
         </where>
     </select>
 
@@ -115,7 +113,7 @@
             <if test="nation != null">nation,</if>
             <if test="nativePlace != null">native_place,</if>
             <if test="phone != null and phone != ''">phone,</if>
-            <if test="department != null and department != ''">department,</if>
+            <if test="classId != null">class_id,</if>
             <if test="userId != null">user_id,</if>
             <if test="deptId != null">dept_id,</if>
             <if test="createTime != null">create_time,</if>
@@ -137,7 +135,7 @@
             <if test="nation != null">#{nation},</if>
             <if test="nativePlace != null">#{nativePlace},</if>
             <if test="phone != null and phone != ''">#{phone},</if>
-            <if test="department != null and department != ''">#{department},</if>
+            <if test="classId != null">#{classId},</if>
             <if test="userId != null">#{userId},</if>
             <if test="deptId != null">#{deptId},</if>
             <if test="createTime != null">#{createTime},</if>
@@ -163,7 +161,7 @@
             <if test="nation != null">nation = #{nation},</if>
             <if test="nativePlace != null">native_place = #{nativePlace},</if>
             <if test="phone != null and phone != ''">phone = #{phone},</if>
-            <if test="department != null and department != ''">department = #{department},</if>
+            <if test="classId != null">class_id = #{classId},</if>
             <if test="userId != null">user_id = #{userId},</if>
             <if test="deptId != null">dept_id = #{deptId},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
