@@ -5,11 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+
+import com.lz.common.core.domain.entity.SysDept;
+import com.lz.common.core.domain.entity.SysUser;
+import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
+
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lz.common.utils.DateUtils;
+
 import javax.annotation.Resource;
+
+import com.lz.system.service.ISysDeptService;
+import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,93 +31,106 @@ import com.lz.manage.model.vo.classInfo.ClassInfoVo;
 
 /**
  * 班级信息Service业务层处理
- * 
+ *
  * @author YY
  * @date 2025-05-16
  */
 @Service
-public class ClassInfoServiceImpl extends ServiceImpl<ClassInfoMapper, ClassInfo> implements IClassInfoService
-{
+public class ClassInfoServiceImpl extends ServiceImpl<ClassInfoMapper, ClassInfo> implements IClassInfoService {
     @Resource
     private ClassInfoMapper classInfoMapper;
 
+    @Resource
+    private ISysUserService userService;
+
+    @Resource
+    private ISysDeptService deptService;
     //region mybatis代码
+
     /**
      * 查询班级信息
-     * 
+     *
      * @param classId 班级信息主键
      * @return 班级信息
      */
     @Override
-    public ClassInfo selectClassInfoByClassId(Long classId)
-    {
+    public ClassInfo selectClassInfoByClassId(Long classId) {
         return classInfoMapper.selectClassInfoByClassId(classId);
     }
 
     /**
      * 查询班级信息列表
-     * 
+     *
      * @param classInfo 班级信息
      * @return 班级信息
      */
     @Override
-    public List<ClassInfo> selectClassInfoList(ClassInfo classInfo)
-    {
-        return classInfoMapper.selectClassInfoList(classInfo);
+    public List<ClassInfo> selectClassInfoList(ClassInfo classInfo) {
+        List<ClassInfo> classInfos = classInfoMapper.selectClassInfoList(classInfo);
+        for (ClassInfo info : classInfos) {
+            SysUser sysUser = userService.selectUserById(info.getUserId());
+            if (StringUtils.isNotNull(sysUser)) {
+                info.setUserName(sysUser.getUserName());
+            }
+            SysDept sysDept = deptService.selectDeptById(info.getDeptId());
+            if (StringUtils.isNotNull(sysDept)) {
+                info.setDeptName(sysDept.getDeptName());
+            }
+        }
+        return classInfos;
     }
 
     /**
      * 新增班级信息
-     * 
+     *
      * @param classInfo 班级信息
      * @return 结果
      */
     @Override
-    public int insertClassInfo(ClassInfo classInfo)
-    {
+    public int insertClassInfo(ClassInfo classInfo) {
+        classInfo.setUserId(SecurityUtils.getUserId());
         classInfo.setCreateTime(DateUtils.getNowDate());
         return classInfoMapper.insertClassInfo(classInfo);
     }
 
     /**
      * 修改班级信息
-     * 
+     *
      * @param classInfo 班级信息
      * @return 结果
      */
     @Override
-    public int updateClassInfo(ClassInfo classInfo)
-    {
+    public int updateClassInfo(ClassInfo classInfo) {
+        classInfo.setUpdatedBy(SecurityUtils.getUsername());
         classInfo.setUpdateTime(DateUtils.getNowDate());
         return classInfoMapper.updateClassInfo(classInfo);
     }
 
     /**
      * 批量删除班级信息
-     * 
+     *
      * @param classIds 需要删除的班级信息主键
      * @return 结果
      */
     @Override
-    public int deleteClassInfoByClassIds(Long[] classIds)
-    {
+    public int deleteClassInfoByClassIds(Long[] classIds) {
         return classInfoMapper.deleteClassInfoByClassIds(classIds);
     }
 
     /**
      * 删除班级信息信息
-     * 
+     *
      * @param classId 班级信息主键
      * @return 结果
      */
     @Override
-    public int deleteClassInfoByClassId(Long classId)
-    {
+    public int deleteClassInfoByClassId(Long classId) {
         return classInfoMapper.deleteClassInfoByClassId(classId);
     }
+
     //endregion
     @Override
-    public QueryWrapper<ClassInfo> getQueryWrapper(ClassInfoQuery classInfoQuery){
+    public QueryWrapper<ClassInfo> getQueryWrapper(ClassInfoQuery classInfoQuery) {
         QueryWrapper<ClassInfo> queryWrapper = new QueryWrapper<>();
         //如果不使用params可以删除
         Map<String, Object> params = classInfoQuery.getParams();
@@ -115,25 +138,25 @@ public class ClassInfoServiceImpl extends ServiceImpl<ClassInfoMapper, ClassInfo
             params = new HashMap<>();
         }
         Long classId = classInfoQuery.getClassId();
-        queryWrapper.eq( StringUtils.isNotNull(classId),"class_id",classId);
+        queryWrapper.eq(StringUtils.isNotNull(classId), "class_id", classId);
 
         String className = classInfoQuery.getClassName();
-        queryWrapper.like(StringUtils.isNotEmpty(className) ,"class_name",className);
+        queryWrapper.like(StringUtils.isNotEmpty(className), "class_name", className);
 
         Long userId = classInfoQuery.getUserId();
-        queryWrapper.eq( StringUtils.isNotNull(userId),"user_id",userId);
+        queryWrapper.eq(StringUtils.isNotNull(userId), "user_id", userId);
 
         Long deptId = classInfoQuery.getDeptId();
-        queryWrapper.eq( StringUtils.isNotNull(deptId),"dept_id",deptId);
+        queryWrapper.eq(StringUtils.isNotNull(deptId), "dept_id", deptId);
 
         Date createTime = classInfoQuery.getCreateTime();
-        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime"))&&StringUtils.isNotNull(params.get("endCreateTime")),"create_time",params.get("beginCreateTime"),params.get("endCreateTime"));
+        queryWrapper.between(StringUtils.isNotNull(params.get("beginCreateTime")) && StringUtils.isNotNull(params.get("endCreateTime")), "create_time", params.get("beginCreateTime"), params.get("endCreateTime"));
 
         String updatedBy = classInfoQuery.getUpdatedBy();
-        queryWrapper.like(StringUtils.isNotEmpty(updatedBy) ,"updated_by",updatedBy);
+        queryWrapper.like(StringUtils.isNotEmpty(updatedBy), "updated_by", updatedBy);
 
         Date updateTime = classInfoQuery.getUpdateTime();
-        queryWrapper.between(StringUtils.isNotNull(params.get("beginUpdateTime"))&&StringUtils.isNotNull(params.get("endUpdateTime")),"update_time",params.get("beginUpdateTime"),params.get("endUpdateTime"));
+        queryWrapper.between(StringUtils.isNotNull(params.get("beginUpdateTime")) && StringUtils.isNotNull(params.get("endUpdateTime")), "update_time", params.get("beginUpdateTime"), params.get("endUpdateTime"));
 
         return queryWrapper;
     }

@@ -30,20 +30,24 @@ public class ClassInfo implements Serializable
     @TableId(value = "class_id", type = IdType.ASSIGN_ID)
     private Long classId;
 
-    /** 实训标题 */
-    @Excel(name = "实训标题")
+    /** 班级标题 */
+    @Excel(name = "班级标题")
     private String className;
 
-    /** 实训描述 */
-    @Excel(name = "实训描述")
+    /** 班级描述 */
+    @Excel(name = "班级描述")
     private String classDesc;
 
     /** 创建人 */
     @Excel(name = "创建人")
+    @TableField(exist = false)
+    private String userName;
     private Long userId;
 
     /** 学院 */
     @Excel(name = "学院")
+    @TableField(exist = false)
+    private String deptName;
     private Long deptId;
 
     /** 创建时间 */

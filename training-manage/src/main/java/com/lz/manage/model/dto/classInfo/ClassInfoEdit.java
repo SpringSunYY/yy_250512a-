@@ -20,10 +20,10 @@ public class ClassInfoEdit implements Serializable
     /** 班级编号 */
     private Long classId;
 
-    /** 实训标题 */
+    /** 班级标题 */
     private String className;
 
-    /** 实训描述 */
+    /** 班级描述 */
     private String classDesc;
 
     /** 创建人 */
