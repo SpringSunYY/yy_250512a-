@@ -307,7 +307,7 @@
                        prop="phone"
       />
       <el-table-column label="院系" :show-overflow-tooltip="true" align="center" v-if="columns[14].visible"
-                       prop="department"
+                       prop="deptName"
       />
       <el-table-column label="学生" :show-overflow-tooltip="true" align="center" v-if="columns[15].visible"
                        prop="userInfoName"

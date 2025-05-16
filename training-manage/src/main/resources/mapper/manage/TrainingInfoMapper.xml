@@ -59,6 +59,8 @@
             <if test="createTime != null ">and create_time = #{createTime}</if>
             <if test="updatedBy != null  and updatedBy != ''">and updated_by like concat('%', #{updatedBy}, '%')</if>
             <if test="updateTime != null ">and update_time = #{updateTime}</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
         </where>
     </select>
 

@@ -66,6 +66,14 @@ public class ClassInfoServiceImpl extends ServiceImpl<ClassInfoMapper, ClassInfo
      */
     @Override
     public List<ClassInfo> selectClassInfoList(ClassInfo classInfo) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("student")
+                || !SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("teacher")) {
+            Long classId = SecurityUtils.getLoginUser().getUser().getClassId();
+            if (StringUtils.isNull(classId)) {
+                classId = 0L;
+            }
+            classInfo.setClassId(classId);
+        }
         List<ClassInfo> classInfos = classInfoMapper.selectClassInfoList(classInfo);
         for (ClassInfo info : classInfos) {
             SysUser sysUser = userService.selectUserById(info.getUserId());

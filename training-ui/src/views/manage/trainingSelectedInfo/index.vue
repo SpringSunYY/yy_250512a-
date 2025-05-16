@@ -592,6 +592,7 @@ export default {
     // 取消按钮
     cancel() {
       this.open = false
+      this.openScore=false
       this.reset()
     },
     // 表单重置
@@ -657,8 +658,8 @@ export default {
       const selectedId = row.selectedId || this.ids
       getTrainingSelectedInfo(selectedId).then(response => {
         this.form = response.data
-        this.open = true
-        this.title = '实训'
+        this.openScore = true
+        this.title = '实训评分'
       })
     },
     /** 提交按钮 */
@@ -669,6 +670,7 @@ export default {
             updateTrainingSelectedInfo(this.form).then(response => {
               this.$modal.msgSuccess('修改成功')
               this.open = false
+              this.openScore=false
               this.getList()
             })
           } else {

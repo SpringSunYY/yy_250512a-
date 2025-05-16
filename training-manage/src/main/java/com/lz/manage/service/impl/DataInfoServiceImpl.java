@@ -75,6 +75,14 @@ public class DataInfoServiceImpl extends ServiceImpl<DataInfoMapper, DataInfo> i
      */
     @Override
     public List<DataInfo> selectDataInfoList(DataInfo dataInfo) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("student")
+                || !SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("teacher")) {
+            Long classId = SecurityUtils.getLoginUser().getUser().getClassId();
+            if (StringUtils.isNull(classId)) {
+                classId = 0L;
+            }
+            dataInfo.setClassId(classId);
+        }
         List<DataInfo> dataInfos = dataInfoMapper.selectDataInfoList(dataInfo);
         for (DataInfo info : dataInfos) {
             SysUser sysUser = userService.selectUserById(info.getUserId());
@@ -119,6 +127,7 @@ public class DataInfoServiceImpl extends ServiceImpl<DataInfoMapper, DataInfo> i
         dataInfo.setDeptId(classInfo.getDeptId());
         dataInfo.setClassId(dataInfo.getClassId());
     }
+
     /**
      * 修改资料信息
      *

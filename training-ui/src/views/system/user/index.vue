@@ -189,7 +189,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="班级" prop="userId" v-if="isClassQuery">
+            <el-form-item label="班级" prop="classId" v-if="isClassQuery">
               <el-select
                 v-model="form.classId"
                 filterable
@@ -453,6 +453,12 @@ export default {
             message: '请输入正确的手机号码',
             trigger: 'blur'
           }
+        ],
+        deptId: [
+          { required: true, message: '归属部门不能为空', trigger: 'blur' }
+        ],
+        classId: [
+          { required: true, message: '归属班级不能为空', trigger: 'blur' }
         ]
       }
     }

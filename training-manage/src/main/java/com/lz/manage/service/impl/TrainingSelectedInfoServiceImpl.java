@@ -149,6 +149,7 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
                 trainingSelectedInfo.setStatus("1");
             } else if (trainingSelectedInfo.getScore().equals(new BigDecimal(0))) {
                 trainingSelectedInfo.setSubmitStatus("0");
+                trainingSelectedInfo.setStatus("2");
             } else {
                 trainingSelectedInfo.setStatus("2");
             }
