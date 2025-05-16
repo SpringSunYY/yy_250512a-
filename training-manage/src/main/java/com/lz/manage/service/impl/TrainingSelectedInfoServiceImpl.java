@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 
 import com.lz.manage.model.domain.ClassInfo;
 import com.lz.manage.model.domain.TrainingInfo;
+import com.lz.manage.model.vo.trainingSelectedInfo.TrainingSelectStatics;
 import com.lz.manage.service.IClassInfoService;
 import com.lz.manage.service.ITrainingInfoService;
 import com.lz.system.service.ISysDeptService;
@@ -79,10 +80,10 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
      */
     @Override
     public List<TrainingSelectedInfo> selectTrainingSelectedInfoList(TrainingSelectedInfo trainingSelectedInfo) {
-        if (SecurityUtils.hasRole("student")) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("student")) {
             trainingSelectedInfo.setUserId(SecurityUtils.getUserId());
         }
-        if (SecurityUtils.hasRole("teacher")) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("teacher")) {
             trainingSelectedInfo.setTeacherId(SecurityUtils.getUserId());
         }
         List<TrainingSelectedInfo> trainingSelectedInfos = trainingSelectedInfoMapper.selectTrainingSelectedInfoList(trainingSelectedInfo);
@@ -234,6 +235,32 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
             return Collections.emptyList();
         }
         return trainingSelectedInfoList.stream().map(TrainingSelectedInfoVo::objToVo).collect(Collectors.toList());
+    }
+
+    @Override
+    public TrainingSelectStatics statics(TrainingSelectedInfo trainingSelectedInfo) {
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("student")) {
+            trainingSelectedInfo.setUserId(SecurityUtils.getUserId());
+        }
+        if (!SecurityUtils.isAdmin(SecurityUtils.getUserId()) && SecurityUtils.hasRole("teacher")) {
+            trainingSelectedInfo.setTeacherId(SecurityUtils.getUserId());
+        }
+        //统计平均分
+        BigDecimal avgScore = trainingSelectedInfoMapper.staticsAvgScore(trainingSelectedInfo);
+        if (StringUtils.isNull(avgScore)) {
+            avgScore = new BigDecimal(0);
+        }
+        //统计通过率
+        BigDecimal passRate = trainingSelectedInfoMapper.staticsPassRate(trainingSelectedInfo);
+        if (StringUtils.isNull(passRate)) {
+            passRate = new BigDecimal(0);
+        }
+        //统计提交率
+        BigDecimal submitRate = trainingSelectedInfoMapper.staticsSubmitRate(trainingSelectedInfo);
+        if (StringUtils.isNull(submitRate)) {
+            submitRate = new BigDecimal(0);
+        }
+        return new TrainingSelectStatics(avgScore, passRate, submitRate);
     }
 
 }

@@ -182,6 +182,34 @@
         >导出
         </el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          size="mini"
+
+          v-hasPermi="['manage:trainingSelectedInfo:list']"
+        >平均分：{{ statics.avgScore }}
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          size="mini"
+          v-hasPermi="['manage:trainingSelectedInfo:list']"
+        >通过率：{{ statics.passRate }}
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          size="mini"
+          v-hasPermi="['manage:trainingSelectedInfo:list']"
+        >提交率：{{ statics.submitRate }}
+        </el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
     </el-row>
 
@@ -355,10 +383,11 @@
 
 <script>
 import {
-  listTrainingSelectedInfo,
-  getTrainingSelectedInfo,
-  delTrainingSelectedInfo,
   addTrainingSelectedInfo,
+  delTrainingSelectedInfo,
+  getTrainingSelectedInfo,
+  listTrainingSelectedInfo,
+  staticsTrainingSelectedInfo,
   updateTrainingSelectedInfo
 } from '@/api/manage/trainingSelectedInfo'
 import { checkPermi } from '@/utils/permission'
@@ -369,6 +398,11 @@ export default {
   dicts: ['training_selected_status', 'training_selected_submit_status'],
   data() {
     return {
+      statics: {
+        avgScore: 0,
+        passRate: 0,
+        submitRate: 0
+      },
       openScore: false,
       isClassQuery: false,
       //班级相关信息
@@ -541,6 +575,9 @@ export default {
         this.trainingSelectedInfoList = response.rows
         this.total = response.total
         this.loading = false
+      })
+      staticsTrainingSelectedInfo(this.queryParams).then(res => {
+        this.statics = res.data
       })
     },
     //获取文件名 此功能只可以下载只有一个文件的

@@ -9,6 +9,14 @@ export function listTrainingSelectedInfo(query) {
   })
 }
 
+export function staticsTrainingSelectedInfo(query) {
+  return request({
+    url: '/manage/trainingSelectedInfo/statics',
+    method: 'get',
+    params: query
+  })
+}
+
 // 查询实训选择详细
 export function getTrainingSelectedInfo(selectedId) {
   return request({

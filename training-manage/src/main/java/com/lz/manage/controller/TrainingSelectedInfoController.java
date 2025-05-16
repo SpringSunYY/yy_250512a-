@@ -55,6 +55,14 @@ public class TrainingSelectedInfoController extends BaseController
         return table;
     }
 
+    @PreAuthorize("@ss.hasPermi('manage:trainingSelectedInfo:list')")
+    @GetMapping("/statics")
+    public AjaxResult statics(TrainingSelectedInfoQuery trainingSelectedInfoQuery)
+    {
+        TrainingSelectedInfo trainingSelectedInfo = TrainingSelectedInfoQuery.queryToObj(trainingSelectedInfoQuery);
+        return success(trainingSelectedInfoService.statics(trainingSelectedInfo));
+    }
+
     /**
      * 导出实训选择列表
      */

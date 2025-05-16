@@ -51,6 +51,82 @@
         <include refid="selectTrainingSelectedInfoVo"/>
         where selected_id = #{selectedId}
     </select>
+    <select id="staticsAvgScore" resultType="java.math.BigDecimal">
+        select avg(score) from tb_training_selected_info
+        <where>
+            <if test="selectedId != null ">and selected_id = #{selectedId}</if>
+            <if test="trainingId != null ">and training_id = #{trainingId}</if>
+            <if test="content != null  and content != ''">and content = #{content}</if>
+            <if test="submitStatus != null  and submitStatus != ''">and submit_status = #{submitStatus}</if>
+            <if test="params.beginSubmitTime != null and params.beginSubmitTime != '' and params.endSubmitTime != null and params.endSubmitTime != ''">
+                and DATE_FORMAT(submit_time, '%Y-%m-%d') between #{params.beginSubmitTime} and #{params.endSubmitTime}
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="teacherId != null ">and teacher_id = #{teacherId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="classId != null ">and class_id = #{classId}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+            <if test="updatedBy != null  and updatedBy != ''">and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
+        </where>
+    </select>
+    <select id="staticsPassRate" resultType="java.math.BigDecimal">
+        SELECT
+        (COUNT(CASE WHEN status = '1' THEN 1 END) / COUNT(CASE WHEN status IN ('1', '2') THEN 1 END)) * 100 AS pass_rate
+        FROM tb_training_selected_info
+        <where>
+            <if test="selectedId != null ">and selected_id = #{selectedId}</if>
+            <if test="trainingId != null ">and training_id = #{trainingId}</if>
+            <if test="content != null  and content != ''">and content = #{content}</if>
+            <if test="submitStatus != null  and submitStatus != ''">and submit_status = #{submitStatus}</if>
+            <if test="params.beginSubmitTime != null and params.beginSubmitTime != '' and params.endSubmitTime != null and params.endSubmitTime != ''">
+                and DATE_FORMAT(submit_time, '%Y-%m-%d') between #{params.beginSubmitTime} and #{params.endSubmitTime}
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="teacherId != null ">and teacher_id = #{teacherId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="classId != null ">and class_id = #{classId}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+            <if test="updatedBy != null  and updatedBy != ''">and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
+        </where>
+    </select>
+    <select id="staticsSubmitRate" resultType="java.math.BigDecimal">
+        SELECT
+        (COUNT(CASE WHEN submit_status = '1' THEN 1 END) / COUNT(*)) * 100 AS pass_rate
+        FROM tb_training_selected_info
+        <where>
+            <if test="selectedId != null ">and selected_id = #{selectedId}</if>
+            <if test="trainingId != null ">and training_id = #{trainingId}</if>
+            <if test="content != null  and content != ''">and content = #{content}</if>
+            <if test="submitStatus != null  and submitStatus != ''">and submit_status = #{submitStatus}</if>
+            <if test="params.beginSubmitTime != null and params.beginSubmitTime != '' and params.endSubmitTime != null and params.endSubmitTime != ''">
+                and DATE_FORMAT(submit_time, '%Y-%m-%d') between #{params.beginSubmitTime} and #{params.endSubmitTime}
+            </if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="teacherId != null ">and teacher_id = #{teacherId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="classId != null ">and class_id = #{classId}</if>
+            <if test="deptId != null ">and dept_id = #{deptId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''">
+                and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+            <if test="updatedBy != null  and updatedBy != ''">and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''">
+                and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}
+            </if>
+        </where>
+    </select>
 
     <insert id="insertTrainingSelectedInfo" parameterType="TrainingSelectedInfo" useGeneratedKeys="true" keyProperty="selectedId">
         insert into tb_training_selected_info
