@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.lz.common.annotation.DataScope;
 import com.lz.common.core.domain.entity.SysDept;
 import com.lz.common.core.domain.entity.SysUser;
+import com.lz.common.exception.ServiceException;
 import com.lz.common.utils.SecurityUtils;
 import com.lz.common.utils.StringUtils;
 
@@ -19,6 +20,8 @@ import com.lz.common.utils.DateUtils;
 
 import javax.annotation.Resource;
 
+import com.lz.manage.model.domain.ClassInfo;
+import com.lz.manage.service.IClassInfoService;
 import com.lz.system.service.ISysDeptService;
 import com.lz.system.service.ISysUserService;
 import org.springframework.stereotype.Service;
@@ -46,6 +49,9 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
 
     @Resource
     private ISysDeptService deptService;
+
+    @Resource
+    private IClassInfoService classInfoService;
     //region mybatis代码
 
     /**
@@ -65,7 +71,7 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
      * @param trainingInfo 实训信息
      * @return 实训信息
      */
-    @DataScope(deptAlias = "tb_training_info",userAlias = "tb_training_info")
+    @DataScope(deptAlias = "tb_training_info", userAlias = "tb_training_info")
     @Override
     public List<TrainingInfo> selectTrainingInfoList(TrainingInfo trainingInfo) {
         List<TrainingInfo> trainingInfos = trainingInfoMapper.selectTrainingInfoList(trainingInfo);
@@ -77,6 +83,10 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
             SysDept sysDept = deptService.selectDeptById(info.getDeptId());
             if (StringUtils.isNotNull(sysDept)) {
                 info.setDeptName(sysDept.getDeptName());
+            }
+            ClassInfo classInfo = classInfoService.selectClassInfoByClassId(info.getClassId());
+            if (StringUtils.isNotNull(classInfo)) {
+                info.setClassName(classInfo.getClassName());
             }
         }
         return trainingInfos;
@@ -90,10 +100,23 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
      */
     @Override
     public int insertTrainingInfo(TrainingInfo trainingInfo) {
+        checkClass(trainingInfo);
         trainingInfo.setUserId(SecurityUtils.getUserId());
-        trainingInfo.setDeptId(SecurityUtils.getDeptId());
         trainingInfo.setCreateTime(DateUtils.getNowDate());
         return trainingInfoMapper.insertTrainingInfo(trainingInfo);
+    }
+
+    private void checkClass(TrainingInfo trainingInfo) {
+        //查询班级
+        ClassInfo classInfo = classInfoService.selectClassInfoByClassId(trainingInfo.getClassId());
+        if (StringUtils.isNull(classInfo)) {
+            throw new ServiceException("班级不存在！！！");
+        }
+        trainingInfo.setDeptId(classInfo.getDeptId());
+        //判断开始结束时间
+        if (trainingInfo.getStartTime().after(trainingInfo.getEndTime())) {
+            throw new ServiceException("开始时间不能大于结束时间！！！");
+        }
     }
 
     /**
@@ -104,6 +127,7 @@ public class TrainingInfoServiceImpl extends ServiceImpl<TrainingInfoMapper, Tra
      */
     @Override
     public int updateTrainingInfo(TrainingInfo trainingInfo) {
+        checkClass(trainingInfo);
         trainingInfo.setUpdatedBy(SecurityUtils.getUsername());
         trainingInfo.setUpdateTime(DateUtils.getNowDate());
         return trainingInfoMapper.updateTrainingInfo(trainingInfo);

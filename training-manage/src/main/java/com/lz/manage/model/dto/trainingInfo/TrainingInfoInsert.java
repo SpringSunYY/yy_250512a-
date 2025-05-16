@@ -10,7 +10,7 @@ import com.lz.manage.model.domain.TrainingInfo;
  * 实训信息Vo对象 tb_training_info
  *
  * @author YY
- * @date 2025-05-12
+ * @date 2025-05-16
  */
 @Data
 public class TrainingInfoInsert implements Serializable
@@ -28,6 +28,26 @@ public class TrainingInfoInsert implements Serializable
 
     /** 实训文件 */
     private String trainingFile;
+
+    /** 开始时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date startTime;
+
+    /** 结束时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date endTime;
+
+    /** 实训地点 */
+    private String location;
+
+    /** 创建人 */
+    private Long userId;
+
+    /** 班级 */
+    private Long classId;
+
+    /** 更新人 */
+    private String updatedBy;
 
     /** 备注 */
     private String remark;

@@ -111,6 +111,9 @@
             AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId},
             ancestors) ))
         </if>
+        <if test="classId != null and classId != 0">
+            AND u.class_id = #{classId}
+        </if>
         <!-- 数据范围过滤 -->
         ${params.dataScope}
     </select>

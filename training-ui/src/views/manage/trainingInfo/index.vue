@@ -17,6 +17,55 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
+      <el-form-item label="开始时间">
+        <el-date-picker
+          v-model="daterangeStartTime"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="结束时间">
+        <el-date-picker
+          v-model="daterangeEndTime"
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item label="实训地点" prop="location">
+        <el-input
+          v-model="queryParams.location"
+          placeholder="请输入实训地点"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="班级" prop="userId" v-if="isClassQuery">
+        <el-select
+          v-model="queryParams.classId"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入班级标题"
+          :remote-method="selectClassInfoList"
+          :loading="classLoading"
+        >
+          <el-option
+            v-for="item in classInfoList"
+            :key="item.classId"
+            :label="item.className"
+            :value="item.classId"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
       <!--      <el-form-item label="创建人" prop="userId">-->
       <!--        <el-input-->
       <!--          v-model="queryParams.userId"-->
@@ -152,26 +201,42 @@
           </el-link>
         </template>
       </el-table-column>
-      <el-table-column label="创建人" :show-overflow-tooltip="true" align="center" v-if="columns[4].visible"
+      <el-table-column label="开始时间" align="center" v-if="columns[4].visible" prop="startTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.startTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="结束时间" align="center" v-if="columns[5].visible" prop="endTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.endTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="实训地点" :show-overflow-tooltip="true" align="center" v-if="columns[6].visible"
+                       prop="location"
+      />
+      <el-table-column label="创建人" :show-overflow-tooltip="true" align="center" v-if="columns[7].visible"
                        prop="userName"
       />
-      <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[5].visible"
+      <el-table-column label="院系" :show-overflow-tooltip="true" align="center" v-if="columns[8].visible"
                        prop="deptName"
       />
-      <el-table-column label="创建时间" align="center" v-if="columns[6].visible" prop="createTime" width="180">
+      <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[9].visible"
+                       prop="className"
+      />
+      <el-table-column label="创建时间" align="center" v-if="columns[10].visible" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[7].visible"
+      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[11].visible"
                        prop="updatedBy"
       />
-      <el-table-column label="更新时间" align="center" v-if="columns[8].visible" prop="updateTime" width="180">
+      <el-table-column label="更新时间" align="center" v-if="columns[12].visible" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[9].visible"
+      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[13].visible"
                        prop="remark"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -224,6 +289,44 @@
         <el-form-item label="实训文件" prop="trainingFile">
           <file-upload :limit="1" v-model="form.trainingFile"/>
         </el-form-item>
+        <el-form-item label="开始时间" prop="startTime">
+          <el-date-picker clearable
+                          v-model="form.startTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="请选择开始时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束时间" prop="endTime">
+          <el-date-picker clearable
+                          v-model="form.endTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="请选择结束时间">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="实训地点" prop="location">
+          <el-input v-model="form.location" placeholder="请输入实训地点" />
+        </el-form-item>
+        <el-form-item label="班级" prop="classId" v-if="isClassQuery">
+          <el-select
+            v-model="form.classId"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入班级标题"
+            :remote-method="selectClassInfoList"
+            :loading="classLoading"
+          >
+            <el-option
+              v-for="item in classInfoList"
+              :key="item.classId"
+              :label="item.className"
+              :value="item.classId"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
@@ -258,11 +361,22 @@ import {
   updateTrainingInfo
 } from '@/api/manage/trainingInfo'
 import { addTrainingSelectedInfo } from '@/api/manage/trainingSelectedInfo'
+import { checkPermi } from '@/utils/permission'
+import { listClassInfo } from '@/api/manage/classInfo'
 
 export default {
   name: 'TrainingInfo',
   data() {
     return {
+      isClassQuery: false,
+      //班级相关信息
+      classInfoList: [],
+      classLoading: false,
+      classQueryParams: {
+        classTitle: '',
+        pageNum: 1,
+        pageSize: 100
+      },
       //选择实训
       selectedOpen: false,
       baseUrl: process.env.VUE_APP_BASE_API,
@@ -272,12 +386,16 @@ export default {
         { key: 1, label: '实训标题', visible: true },
         { key: 2, label: '实训描述', visible: true },
         { key: 3, label: '实训文件', visible: true },
-        { key: 4, label: '创建人', visible: true },
-        { key: 5, label: '班级', visible: true },
-        { key: 6, label: '创建时间', visible: false },
-        { key: 7, label: '更新人', visible: false },
-        { key: 8, label: '更新时间', visible: false },
-        { key: 9, label: '备注', visible: false }
+        { key: 4, label: '开始时间', visible: true },
+        { key: 5, label: '结束时间', visible: true },
+        { key: 6, label: '实训地点', visible: true },
+        { key: 7, label: '创建人', visible: true },
+        { key: 8, label: '院系', visible: true },
+        { key: 9, label: '班级', visible: true },
+        { key: 10, label: '创建时间', visible: true },
+        { key: 11, label: '更新人', visible: false },
+        { key: 12, label: '更新时间', visible: false },
+        { key: 13, label: '备注', visible: false },
       ],
       // 遮罩层
       loading: true,
@@ -299,6 +417,10 @@ export default {
       open: false,
       // 备注时间范围
       daterangeCreateTime: [],
+      // 备注时间范围
+      daterangeStartTime: [],
+      // 备注时间范围
+      daterangeEndTime: [],
       // 备注时间范围
       daterangeUpdateTime: [],
       // 查询参数
@@ -334,14 +456,62 @@ export default {
         ],
         createTime: [
           { required: true, message: '创建时间不能为空', trigger: 'blur' }
-        ]
+        ],
+        classId: [
+          { required: true, message: "班级不能为空", trigger: "blur" }
+        ],
+        startTime:[
+          {required: true, message: "开始时间不能为空", trigger: "blur"}
+        ],
+        endTime:[
+          {required: true, message: "结束时间不能为空", trigger: "blur"}
+        ],
       }
     }
   },
   created() {
     this.getList()
+    if (checkPermi(['manage:classInfo:list'])) {
+      this.isClassQuery = true
+      this.getClassInfoList()
+    }
   },
   methods: {
+    checkPermi,
+    /**
+     * 获取班级列表推荐
+     * @param query
+     */
+    selectClassInfoList(query) {
+      if (query !== '') {
+        this.classLoading = true
+        this.classQueryParams.classTitle = query
+        setTimeout(() => {
+          this.getClassInfoList()
+        }, 200)
+      } else {
+        this.classInfoList = []
+        this.classQueryParams.className = null
+      }
+    },
+    /**
+     * 获取班级信息列表
+     */
+    getClassInfoList() {
+      //添加查询参数
+      if (this.form.classId != null) {
+        this.classQueryParams.classId = this.form.classId
+      } else {
+        this.classQueryParams.classId = null
+      }
+      if (this.classQueryParams.classTitle !== '') {
+        this.classQueryParams.classId = null
+      }
+      listClassInfo(this.classQueryParams).then(res => {
+        this.classInfoList = res?.rows
+        this.classLoading = false
+      })
+    },
     //  打开选择实训
     handleSelectedAdd(row) {
       this.reset()
@@ -350,8 +520,8 @@ export default {
       this.selectedOpen = true
     },
     //提交选择
-    submitFormSelected(){
-      addTrainingSelectedInfo(this.form).then(res=>{
+    submitFormSelected() {
+      addTrainingSelectedInfo(this.form).then(res => {
         this.$modal.msgSuccess('选择成功')
         this.selectedOpen = false
         this.getList()
@@ -368,6 +538,15 @@ export default {
       if (null != this.daterangeUpdateTime && '' != this.daterangeUpdateTime) {
         this.queryParams.params['beginUpdateTime'] = this.daterangeUpdateTime[0]
         this.queryParams.params['endUpdateTime'] = this.daterangeUpdateTime[1]
+      }
+      this.queryParams.params = {};
+      if (null != this.daterangeStartTime && '' != this.daterangeStartTime) {
+        this.queryParams.params["beginStartTime"] = this.daterangeStartTime[0];
+        this.queryParams.params["endStartTime"] = this.daterangeStartTime[1];
+      }
+      if (null != this.daterangeEndTime && '' != this.daterangeEndTime) {
+        this.queryParams.params["beginEndTime"] = this.daterangeEndTime[0];
+        this.queryParams.params["endEndTime"] = this.daterangeEndTime[1];
       }
       listTrainingInfo(this.queryParams).then(response => {
         this.trainingInfoList = response.rows
@@ -415,6 +594,8 @@ export default {
     resetQuery() {
       this.daterangeCreateTime = []
       this.daterangeUpdateTime = []
+      this.daterangeStartTime = [];
+      this.daterangeEndTime = [];
       this.resetForm('queryForm')
       this.handleQuery()
     },

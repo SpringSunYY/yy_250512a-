@@ -41,6 +41,25 @@
                   />
                 </el-select>
               </el-form-item>
+              <el-form-item label="班级" prop="classId" v-if="isClassQuery">
+                <el-select
+                  v-model="queryParams.classId"
+                  filterable
+                  remote
+                  reserve-keyword
+                  placeholder="请输入班级标题"
+                  :remote-method="selectClassInfoList"
+                  :loading="classLoading"
+                >
+                  <el-option
+                    v-for="item in classInfoList"
+                    :key="item.classId"
+                    :label="item.className"
+                    :value="item.classId"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item label="创建时间">
                 <el-date-picker v-model="dateRange" style="width: 240px" value-format="yyyy-MM-dd" type="daterange"
                                 range-separator="-" start-placeholder="开始日期" end-placeholder="结束日期"
@@ -331,7 +350,6 @@ export default {
       classLoading: false,
       classQueryParams: {
         classTitle: '',
-        roleId: 100,
         pageNum: 1,
         pageSize: 100
       },
