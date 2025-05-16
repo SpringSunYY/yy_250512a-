@@ -268,6 +268,14 @@
           <el-button
             size="mini"
             type="text"
+            icon="el-icon-edit"
+            @click="handleScore(scope.row)"
+            v-hasPermi="['manage:trainingSelectedInfo:score']"
+          >评分
+          </el-button>
+          <el-button
+            size="mini"
+            type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['manage:trainingSelectedInfo:remove']"
@@ -307,12 +315,6 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="评分" prop="score" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
-          <el-input-number :min="0" :max="100" v-model="form.score" placeholder="请输入评分"/>
-        </el-form-item>
-        <el-form-item label="评语" prop="comment" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
-          <el-input v-model="form.comment" type="textarea" placeholder="请输入内容"/>
-        </el-form-item>
         <!--        <el-form-item label="状态" prop="status">-->
         <!--          <el-radio-group v-model="form.status">-->
         <!--            <el-radio-->
@@ -325,6 +327,22 @@
         <!--        </el-form-item>-->
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 添加或修改实训选择对话框 -->
+    <el-dialog :title="title" :visible.sync="openScore" width="500px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="评分" prop="score" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
+          <el-input-number :min="0" :max="100" v-model="form.score" placeholder="请输入评分"/>
+        </el-form-item>
+        <el-form-item label="评语" prop="comment" v-if="checkPermi(['manage:trainingSelectedInfo:score'])">
+          <el-input v-model="form.comment" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -351,6 +369,7 @@ export default {
   dicts: ['training_selected_status', 'training_selected_submit_status'],
   data() {
     return {
+      openScore: false,
       isClassQuery: false,
       //班级相关信息
       classInfoList: [],
@@ -423,7 +442,7 @@ export default {
         createTime: null,
         updatedBy: null,
         updateTime: null,
-        classId:null
+        classId: null
       },
       // 表单参数
       form: {},
@@ -587,6 +606,16 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      this.reset()
+      const selectedId = row.selectedId || this.ids
+      getTrainingSelectedInfo(selectedId).then(response => {
+        this.form = response.data
+        this.open = true
+        this.title = '实训'
+      })
+    },
+    /** 评分按钮操作 */
+    handleScore(row) {
       this.reset()
       const selectedId = row.selectedId || this.ids
       getTrainingSelectedInfo(selectedId).then(response => {
