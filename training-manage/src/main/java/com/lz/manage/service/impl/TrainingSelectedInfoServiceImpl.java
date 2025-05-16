@@ -20,7 +20,9 @@ import com.lz.common.utils.DateUtils;
 
 import javax.annotation.Resource;
 
+import com.lz.manage.model.domain.ClassInfo;
 import com.lz.manage.model.domain.TrainingInfo;
+import com.lz.manage.service.IClassInfoService;
 import com.lz.manage.service.ITrainingInfoService;
 import com.lz.system.service.ISysDeptService;
 import com.lz.system.service.ISysUserService;
@@ -52,6 +54,9 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
 
     @Resource
     private ISysDeptService deptService;
+
+    @Resource
+    private IClassInfoService classInfoService;
 
     //region mybatis代码
 
@@ -98,6 +103,10 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
             if (StringUtils.isNotNull(teacher)) {
                 info.setTeacherName(teacher.getUserName());
             }
+            ClassInfo classInfo = classInfoService.selectClassInfoByClassId(info.getClassId());
+            if (StringUtils.isNotNull(classInfo)) {
+                info.setClassName(classInfo.getClassName());
+            }
         }
         return trainingSelectedInfos;
     }
@@ -115,6 +124,7 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
         if (StringUtils.isNull(trainingInfo)) {
             throw new ServiceException("实训不存在！！！");
         }
+        trainingSelectedInfo.setClassId(trainingInfo.getClassId());
         trainingSelectedInfo.setStatus("0");
         trainingSelectedInfo.setSubmitStatus("0");
         trainingSelectedInfo.setDeptId(trainingInfo.getDeptId());
@@ -184,8 +194,6 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
         String content = trainingSelectedInfoQuery.getContent();
         queryWrapper.eq(StringUtils.isNotEmpty(content), "content", content);
 
-        String contentFile = trainingSelectedInfoQuery.getContentFile();
-        queryWrapper.eq(StringUtils.isNotEmpty(contentFile), "content_file", contentFile);
 
         String submitStatus = trainingSelectedInfoQuery.getSubmitStatus();
         queryWrapper.eq(StringUtils.isNotEmpty(submitStatus), "submit_status", submitStatus);
@@ -193,8 +201,6 @@ public class TrainingSelectedInfoServiceImpl extends ServiceImpl<TrainingSelecte
         Date submitTime = trainingSelectedInfoQuery.getSubmitTime();
         queryWrapper.between(StringUtils.isNotNull(params.get("beginSubmitTime")) && StringUtils.isNotNull(params.get("endSubmitTime")), "submit_time", params.get("beginSubmitTime"), params.get("endSubmitTime"));
 
-        BigDecimal score = trainingSelectedInfoQuery.getScore();
-        queryWrapper.eq(StringUtils.isNotNull(score), "score", score);
 
         String status = trainingSelectedInfoQuery.getStatus();
         queryWrapper.eq(StringUtils.isNotEmpty(status), "status", status);

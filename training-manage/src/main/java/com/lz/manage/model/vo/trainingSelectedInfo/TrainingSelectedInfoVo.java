@@ -93,10 +93,16 @@ public class TrainingSelectedInfoVo implements Serializable {
     private String userName;
     private Long userId;
 
+    /** 班级 */
+    @Excel(name = "班级")
+    private String className;
+    private Long classId;
+
+
     /**
      * 班级
      */
-    @Excel(name = "班级")
+    @Excel(name = "院校")
     private String deptName;
     private Long deptId;
 

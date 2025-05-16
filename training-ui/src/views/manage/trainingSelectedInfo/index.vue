@@ -91,6 +91,25 @@
           end-placeholder="结束日期"
         ></el-date-picker>
       </el-form-item>
+      <el-form-item label="班级" prop="classId" v-if="isClassQuery">
+        <el-select
+          v-model="queryParams.classId"
+          filterable
+          remote
+          reserve-keyword
+          placeholder="请输入班级标题"
+          :remote-method="selectClassInfoList"
+          :loading="classLoading"
+        >
+          <el-option
+            v-for="item in classInfoList"
+            :key="item.classId"
+            :label="item.className"
+            :value="item.classId"
+          >
+          </el-option>
+        </el-select>
+      </el-form-item>
       <!--      <el-form-item label="更新人" prop="updatedBy">-->
       <!--        <el-input-->
       <!--          v-model="queryParams.updatedBy"-->
@@ -215,22 +234,25 @@
                        prop="userName"
       />
       <el-table-column label="班级" :show-overflow-tooltip="true" align="center" v-if="columns[11].visible"
+                       prop="className"
+      />
+      <el-table-column label="院校" :show-overflow-tooltip="true" align="center" v-if="columns[12].visible"
                        prop="deptName"
       />
-      <el-table-column label="创建时间" align="center" v-if="columns[12].visible" prop="createTime" width="180">
+      <el-table-column label="创建时间" align="center" v-if="columns[13].visible" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[13].visible"
+      <el-table-column label="更新人" :show-overflow-tooltip="true" align="center" v-if="columns[14].visible"
                        prop="updatedBy"
       />
-      <el-table-column label="更新时间" align="center" v-if="columns[14].visible" prop="updateTime" width="180">
+      <el-table-column label="更新时间" align="center" v-if="columns[15].visible" prop="updateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[15].visible"
+      <el-table-column label="备注" :show-overflow-tooltip="true" align="center" v-if="columns[16].visible"
                        prop="remark"
       />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -322,12 +344,22 @@ import {
   updateTrainingSelectedInfo
 } from '@/api/manage/trainingSelectedInfo'
 import { checkPermi } from '@/utils/permission'
+import { listClassInfo } from '@/api/manage/classInfo'
 
 export default {
   name: 'TrainingSelectedInfo',
   dicts: ['training_selected_status', 'training_selected_submit_status'],
   data() {
     return {
+      isClassQuery: false,
+      //班级相关信息
+      classInfoList: [],
+      classLoading: false,
+      classQueryParams: {
+        classTitle: '',
+        pageNum: 1,
+        pageSize: 100
+      },
       baseUrl: process.env.VUE_APP_BASE_API,
       //表格展示列
       columns: [
@@ -343,10 +375,11 @@ export default {
         { key: 9, label: '老师', visible: true },
         { key: 10, label: '学生', visible: true },
         { key: 11, label: '班级', visible: true },
-        { key: 12, label: '创建时间', visible: false },
-        { key: 13, label: '更新人', visible: false },
-        { key: 14, label: '更新时间', visible: false },
-        { key: 15, label: '备注', visible: false }
+        { key: 12, label: '院校', visible: true },
+        { key: 13, label: '创建时间', visible: false },
+        { key: 14, label: '更新人', visible: false },
+        { key: 15, label: '更新时间', visible: false },
+        { key: 16, label: '备注', visible: false }
       ],
       // 遮罩层
       loading: true,
@@ -389,7 +422,8 @@ export default {
         deptId: null,
         createTime: null,
         updatedBy: null,
-        updateTime: null
+        updateTime: null,
+        classId:null
       },
       // 表单参数
       form: {},
@@ -427,9 +461,47 @@ export default {
   },
   created() {
     this.getList()
+    if (checkPermi(['manage:classInfo:list'])) {
+      this.isClassQuery = true
+      this.getClassInfoList()
+    }
   },
   methods: {
     checkPermi,
+    /**
+     * 获取班级列表推荐
+     * @param query
+     */
+    selectClassInfoList(query) {
+      if (query !== '') {
+        this.classLoading = true
+        this.classQueryParams.classTitle = query
+        setTimeout(() => {
+          this.getClassInfoList()
+        }, 200)
+      } else {
+        this.classInfoList = []
+        this.classQueryParams.className = null
+      }
+    },
+    /**
+     * 获取班级信息列表
+     */
+    getClassInfoList() {
+      //添加查询参数
+      if (this.form.classId != null) {
+        this.classQueryParams.classId = this.form.classId
+      } else {
+        this.classQueryParams.classId = null
+      }
+      if (this.classQueryParams.classTitle !== '') {
+        this.classQueryParams.classId = null
+      }
+      listClassInfo(this.classQueryParams).then(res => {
+        this.classInfoList = res?.rows
+        this.classLoading = false
+      })
+    },
     /** 查询实训选择列表 */
     getList() {
       this.loading = true

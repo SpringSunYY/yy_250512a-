@@ -101,13 +101,18 @@ public class TrainingSelectedInfo implements Serializable {
     private String userName;
     private Long userId;
 
-    /**
-     * 班级
-     */
+    /** 班级 */
     @Excel(name = "班级")
+    @TableField(exist = false)
+    private String className;
+    private Long classId;
+
+    /** 院校 */
+    @Excel(name = "院校")
     @TableField(exist = false)
     private String deptName;
     private Long deptId;
+
 
     /**
      * 创建时间

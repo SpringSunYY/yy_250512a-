@@ -47,7 +47,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="班级" prop="userId" v-if="isClassQuery">
+      <el-form-item label="班级" prop="classId" v-if="isClassQuery">
         <el-select
           v-model="queryParams.classId"
           filterable
