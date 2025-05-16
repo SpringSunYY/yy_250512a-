@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.manage.mapper.DataInfoMapper">
+    
+    <resultMap type="DataInfo" id="DataInfoResult">
+        <result property="dataId"    column="data_id"    />
+        <result property="dataTitle"    column="data_title"    />
+        <result property="dataDesc"    column="data_desc"    />
+        <result property="dataFile"    column="data_file"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updatedBy"    column="updated_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectDataInfoVo">
+        select data_id, data_title, data_desc, data_file, user_id, dept_id, class_id, create_time, updated_by, update_time, remark from tb_data_info
+    </sql>
+
+    <select id="selectDataInfoList" parameterType="DataInfo" resultMap="DataInfoResult">
+        <include refid="selectDataInfoVo"/>
+        <where>  
+            <if test="dataId != null "> and data_id = #{dataId}</if>
+            <if test="dataTitle != null  and dataTitle != ''"> and data_title = #{dataTitle}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="classId != null "> and class_id = #{classId}</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.endCreateTime != null and params.endCreateTime != ''"> and DATE_FORMAT(create_time, '%Y-%m-%d') between #{params.beginCreateTime} and #{params.endCreateTime}</if>
+            <if test="updatedBy != null  and updatedBy != ''"> and updated_by like concat('%', #{updatedBy}, '%')</if>
+            <if test="params.beginUpdateTime != null and params.beginUpdateTime != '' and params.endUpdateTime != null and params.endUpdateTime != ''"> and DATE_FORMAT(update_time, '%Y-%m-%d') between #{params.beginUpdateTime} and #{params.endUpdateTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectDataInfoByDataId" parameterType="Long" resultMap="DataInfoResult">
+        <include refid="selectDataInfoVo"/>
+        where data_id = #{dataId}
+    </select>
+
+    <insert id="insertDataInfo" parameterType="DataInfo" useGeneratedKeys="true" keyProperty="dataId">
+        insert into tb_data_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="dataTitle != null and dataTitle != ''">data_title,</if>
+            <if test="dataDesc != null and dataDesc != ''">data_desc,</if>
+            <if test="dataFile != null">data_file,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="classId != null">class_id,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updatedBy != null">updated_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="dataTitle != null and dataTitle != ''">#{dataTitle},</if>
+            <if test="dataDesc != null and dataDesc != ''">#{dataDesc},</if>
+            <if test="dataFile != null">#{dataFile},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="classId != null">#{classId},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updatedBy != null">#{updatedBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDataInfo" parameterType="DataInfo">
+        update tb_data_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="dataTitle != null and dataTitle != ''">data_title = #{dataTitle},</if>
+            <if test="dataDesc != null and dataDesc != ''">data_desc = #{dataDesc},</if>
+            <if test="dataFile != null">data_file = #{dataFile},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="classId != null">class_id = #{classId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where data_id = #{dataId}
+    </update>
+
+    <delete id="deleteDataInfoByDataId" parameterType="Long">
+        delete from tb_data_info where data_id = #{dataId}
+    </delete>
+
+    <delete id="deleteDataInfoByDataIds" parameterType="String">
+        delete from tb_data_info where data_id in 
+        <foreach item="dataId" collection="array" open="(" separator="," close=")">
+            #{dataId}
+        </foreach>
+    </delete>
+</mapper>
