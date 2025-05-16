@@ -29,7 +29,7 @@ public class ArchiveInfo implements Serializable {
     /**
      * 档案编号
      */
-    @Excel(name = "档案编号")
+//    @Excel(name = "档案编号")
     @TableId(value = "archive_id", type = IdType.ASSIGN_ID)
     private Long archiveId;
 
@@ -48,14 +48,14 @@ public class ArchiveInfo implements Serializable {
     /**
      * 性别
      */
-    @Excel(name = "性别")
+    @Excel(name = "性别", readConverterExp = "0=男,1=女,2=未知",prompt = "只能填入：男、女、未知")
     private String sex;
 
     /**
      * 生日
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "生日", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "生日", width = 30, dateFormat = "yyyy-MM-dd",prompt = "时间格式：yyyy-MM-dd")
     private Date birthday;
 
     /**
@@ -68,7 +68,7 @@ public class ArchiveInfo implements Serializable {
      * 入校日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "入校日期", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "入校日期", width = 30, dateFormat = "yyyy-MM-dd",prompt = "时间格式：yyyy-MM-dd")
     private Date joinTime;
 
     /**
@@ -81,7 +81,7 @@ public class ArchiveInfo implements Serializable {
      * 高中毕业日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "高中毕业日期", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "高中毕业日期", width = 30, dateFormat = "yyyy-MM-dd",prompt = "时间格式：yyyy-MM-dd")
     private Date graduatingTime;
 
     /**
@@ -114,11 +114,6 @@ public class ArchiveInfo implements Serializable {
     @Excel(name = "联系电话")
     private String phone;
 
-    /**
-     * 院系
-     */
-    @Excel(name = "院系")
-    private String department;
 
     /**
      * 学生
@@ -132,7 +127,7 @@ public class ArchiveInfo implements Serializable {
     /**
      * 班级
      */
-    @Excel(name = "班级编号", type = Excel.Type.IMPORT)
+//    @Excel(name = "班级编号", type = Excel.Type.IMPORT)
     private Long classId;
     @TableField(exist = false)
     private String className;
@@ -140,7 +135,7 @@ public class ArchiveInfo implements Serializable {
     /**
      * 班级
      */
-    @Excel(name = "院校")
+    @Excel(name = "院校",type = Excel.Type.EXPORT)
     @TableField(exist = false)
     private String deptName;
     private Long deptId;
@@ -149,20 +144,20 @@ public class ArchiveInfo implements Serializable {
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd",type = Excel.Type.EXPORT)
     private Date createTime;
 
     /**
      * 更新人
      */
-    @Excel(name = "更新人")
+    @Excel(name = "更新人",type = Excel.Type.EXPORT)
     private String updatedBy;
 
     /**
      * 更新时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "更新时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @Excel(name = "更新时间", width = 30, dateFormat = "yyyy-MM-dd",type = Excel.Type.EXPORT)
     private Date updateTime;
 
     /**

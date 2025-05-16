@@ -243,4 +243,66 @@ public class ArchiveInfoServiceImpl extends ServiceImpl<ArchiveInfoMapper, Archi
         return archiveInfoList.stream().map(ArchiveInfoVo::objToVo).collect(Collectors.toList());
     }
 
+    @Override
+    public String importArchiveInfo(List<ArchiveInfo> list) {
+        //校验数据是否为空
+        if (StringUtils.isEmpty(list)) {
+            return "导入数据不能为空！";
+        }
+        //校验关键数据是否为空
+        for (int i = 0; i < list.size(); i++) {
+            int index = i + 1;
+            ArchiveInfo archiveInfo = list.get(i);
+            if (StringUtils.isEmpty(archiveInfo.getUsername())) {
+                return StringUtils.format("第{}行：学生姓名不能为空！", index);
+            }
+            if (StringUtils.isEmpty(archiveInfo.getStuNo())) {
+                return StringUtils.format("第{}行：学号不能为空！", index);
+            }
+            if (StringUtils.isEmpty(archiveInfo.getSex())) {
+                return StringUtils.format("第{}行：性别不能为空！", index);
+            }
+            if (StringUtils.isNull(archiveInfo.getJoinTime())) {
+                return StringUtils.format("第{}行：入校不能为空！", index);
+            }
+            if (StringUtils.isEmpty(archiveInfo.getIdCard())) {
+                return StringUtils.format("第{}行：身份证号不能为空！", index);
+            }
+            if (StringUtils.isEmpty(archiveInfo.getPhone())) {
+                return StringUtils.format("第{}行：手机号码不能为空！", index);
+            }
+            if (StringUtils.isNull(archiveInfo.getUserId())) {
+                return StringUtils.format("第{}行：用户编号不能为空！", index);
+            }
+            archiveInfo.setCreateTime(DateUtils.getNowDate());
+        }
+        for (int i = 0; i < list.size(); i++) {
+            int index = i + 1;
+            ArchiveInfo archiveInfo = list.get(i);
+            //查询用户是否存在
+            SysUser sysUser = userService.selectUserById(archiveInfo.getUserId());
+            if (StringUtils.isNull(sysUser)) {
+                return StringUtils.format("第{}行：用户不存在！", index);
+            }
+            //用户是否绑定班级
+            if (StringUtils.isNull(sysUser.getClassId())) {
+                return StringUtils.format("第{}行：用户未绑定班级！", index);
+            }
+            //班级是否存在
+            ClassInfo classInfo = classInfoService.selectClassInfoByClassId(sysUser.getClassId());
+            if (StringUtils.isNull(classInfo)) {
+                return StringUtils.format("第{}行：班级不存在！", index);
+            }
+            //判断班级是否绑定学院
+            if (StringUtils.isNull(classInfo.getDeptId())) {
+                return StringUtils.format("第{}行：班级未绑定学院！", index);
+            }
+            //设置班级学院
+            archiveInfo.setDeptId(classInfo.getDeptId());
+            archiveInfo.setClassId(sysUser.getClassId());
+        }
+        this.saveBatch(list);
+        return StringUtils.format("导入成功{}条数据！", list.size());
+    }
+
 }

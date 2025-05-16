@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * 学生档案Service接口
- * 
+ *
  * @author YY
  * @date 2025-05-12
  */
@@ -18,7 +18,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
     //region mybatis代码
     /**
      * 查询学生档案
-     * 
+     *
      * @param archiveId 学生档案主键
      * @return 学生档案
      */
@@ -26,7 +26,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
 
     /**
      * 查询学生档案列表
-     * 
+     *
      * @param archiveInfo 学生档案
      * @return 学生档案集合
      */
@@ -34,7 +34,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
 
     /**
      * 新增学生档案
-     * 
+     *
      * @param archiveInfo 学生档案
      * @return 结果
      */
@@ -42,7 +42,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
 
     /**
      * 修改学生档案
-     * 
+     *
      * @param archiveInfo 学生档案
      * @return 结果
      */
@@ -50,7 +50,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
 
     /**
      * 批量删除学生档案
-     * 
+     *
      * @param archiveIds 需要删除的学生档案主键集合
      * @return 结果
      */
@@ -58,7 +58,7 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
 
     /**
      * 删除学生档案信息
-     * 
+     *
      * @param archiveId 学生档案主键
      * @return 结果
      */
@@ -79,4 +79,14 @@ public interface IArchiveInfoService extends IService<ArchiveInfo>
      * @return ArchiveInfoVO集合
      */
     List<ArchiveInfoVo> convertVoList(List<ArchiveInfo> archiveInfoList);
+
+    /**
+     * 导入学生档案信息
+     * @author: YY
+     * @method: importArchiveInfo
+     * @date: 2025/5/16 20:16
+     * @param list 档案列表
+     * @return String
+     **/
+    String importArchiveInfo(List<ArchiveInfo> list);
 }

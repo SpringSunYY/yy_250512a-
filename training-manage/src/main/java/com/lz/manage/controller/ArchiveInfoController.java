@@ -25,6 +25,7 @@ import com.lz.manage.model.dto.archiveInfo.ArchiveInfoEdit;
 import com.lz.manage.service.IArchiveInfoService;
 import com.lz.common.utils.poi.ExcelUtil;
 import com.lz.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 学生档案Controller
@@ -113,5 +114,22 @@ public class ArchiveInfoController extends BaseController
     public AjaxResult remove(@PathVariable Long[] archiveIds)
     {
         return toAjax(archiveInfoService.deleteArchiveInfoByArchiveIds(archiveIds));
+    }
+
+    @PreAuthorize("@ss.hasPermi('manage:archiveInfo:import')")
+    @Log(title = "导入学生档案", businessType = BusinessType.IMPORT)
+    @PostMapping("/importData")
+    public AjaxResult importData(MultipartFile file) throws Exception {
+        ExcelUtil<ArchiveInfo> util = new ExcelUtil<ArchiveInfo>(ArchiveInfo.class);
+        List<ArchiveInfo> list = util.importExcel(file.getInputStream());
+        String message = archiveInfoService.importArchiveInfo(list);
+        return success(message);
+    }
+
+    @PreAuthorize("@ss.hasPermi('manage:archiveInfo:import')")
+    @PostMapping("/importTemplate")
+    public void importTemplate(HttpServletResponse response) {
+        ExcelUtil<ArchiveInfo> util = new ExcelUtil<ArchiveInfo>(ArchiveInfo.class);
+        util.importTemplateExcel(response, "学生档案数据");
     }
 }
